@@ -1,19 +1,19 @@
 // const { expect } = require("chai");
-const { ethers } = require("hardhat");
+// const { ethers } = require("hardhat");
 const { web3tx, toWad, wad4human } = require("@decentral.ee/web3-helpers");
 
 const deployFramework = require("@superfluid-finance/ethereum-contracts/scripts/deploy-framework");
 const deployTestToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-test-token");
 const deploySuperToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-super-token");
 const SuperfluidSDK = require("@superfluid-finance/js-sdk");
-const TradeableCashflowOption = artifacts.require("TradeableCashflowOption");
+const TradeablePutOption = artifacts.require("TradeablePutOption");
 const MockV3Aggregator = artifacts.require("MockV3Aggregator");
 
 const traveler = require("ganache-time-traveler");
 // const { it } = require("ethers/wordlists");
 const TEST_TRAVEL_TIME = 3600 * 2; // 1 hours
 const ONE_YEAR_TIME = 3600 * 2 * 24 * 366; //one year and one day
-contract("TradeableCashflowOption", (accounts) => {
+contract("TradeablePutOption", (accounts) => {
   const errorHandler = (err) => {
     if (err) throw err;
   };
@@ -28,6 +28,7 @@ contract("TradeableCashflowOption", (accounts) => {
   let app;
   let mockPriceFeed;
   let mockPriceFeed2;
+  let mockPriceFeed3;
   let price;
   let outOfMoneyPrice;
   const u = {}; // object with all users
@@ -104,10 +105,10 @@ contract("TradeableCashflowOption", (accounts) => {
     console.log(sf.host.address);
     console.log(sf.agreements.cfa.address);
     console.log(daix.address);
-    app = await TradeableCashflowOption.new(
+    app = await TradeablePutOption.new(
       //first param is owner of option
       u.admin.address,
-      "StreamingCallOption",
+      "StreamingPutOption",
       "OPTx",
       sf.host.address,
       sf.agreements.cfa.address,
@@ -123,6 +124,7 @@ contract("TradeableCashflowOption", (accounts) => {
     outOfMoneyPrice = 2700000000;
     mockPriceFeed = await MockV3Aggregator.new(price);
     mockPriceFeed2 = await MockV3Aggregator.new(outOfMoneyPrice);
+    mockPriceFeed3 = await MockV3Aggregator.new(4000000000);
   });
 
   async function checkBalance(user) {
@@ -205,18 +207,18 @@ contract("TradeableCashflowOption", (accounts) => {
     it("Case 1 - Owner calls createOption()", async () => {
       const { admin, alice } = u;
       await app.createOption(
-        link.address, //LINK rinkeby token
-        web3.utils.toWei("1", "ether"), //1 unit
-        18, //link has 18 decimals
-        mockPriceFeed.address, //the address of our mock price feed
+        web3.utils.toWei("28", "ether"), //underlyingAmount,
+        link.address, //purchasingAsset,
+        web3.utils.toWei("1", "ether"), //strikePrice,
+        18, //purchasingDecimals,
+        mockPriceFeed2.address, //the address of our mock price feed
         8, //price feed will return 8 decimal value
         "3858024609", //~100 per mo
         1669166376, //Nov 24, 2022,
-        web3.utils.toWei("28", "ether"), //strike price of this call option is $28
         { from: admin.address }
       );
 
-      let underlyingAsset = await app._underlyingAsset.call();
+      let purchasingAsset = await app._purchasingAsset.call();
       let underlyingAmount = await app._underlyingAmount.call();
       let underlyingDecimals = await app._underlyingDecimals.call();
       let priceFeed = await app._priceFeed.call();
@@ -226,17 +228,21 @@ contract("TradeableCashflowOption", (accounts) => {
       let strikePrice = await app._strikePrice.call();
 
       assert.equal(
-        underlyingAsset,
+        purchasingAsset,
         link.address,
         "Underlying asset is incorrect"
       );
       assert.equal(
-        underlyingAmount,
+        strikePrice,
         web3.utils.toWei("1", "ether"),
         "underlying amount is incorrect"
       );
       assert.equal(underlyingDecimals, 18, "underlying decimals is incorrect");
-      assert.equal(priceFeed, mockPriceFeed.address, "price feed is incorrect");
+      assert.equal(
+        priceFeed,
+        mockPriceFeed2.address,
+        "price feed is incorrect"
+      );
       assert.equal(priceFeedDecimals, 8, "pricefeed decimals is incorrect");
       assert.equal(
         requiredFlowRate,
@@ -245,7 +251,7 @@ contract("TradeableCashflowOption", (accounts) => {
       );
       assert.equal(expirationDate, 1669166376, "expiry is incorrect");
       assert.equal(
-        strikePrice,
+        underlyingAmount,
         web3.utils.toWei("28", "ether"),
         "strike price is incorrect"
       );
@@ -255,15 +261,15 @@ contract("TradeableCashflowOption", (accounts) => {
       const { admin, alice } = u;
       //option has already been activated
 
-      //option seller approves link token transfer
-      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
+      //option seller approves dai token transfer
+      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
         from: admin.address,
       });
 
       await upgrade([alice]);
       await checkBalance(alice);
-      let sellerLinkBalance = await link.balanceOf(admin.address);
-      console.log("link owner balance: " + sellerLinkBalance);
+      let sellerDaiBalance = await dai.balanceOf(admin.address);
+      console.log("dai owner balance: " + sellerDaiBalance);
       console.log(app.address);
       await alice.flow({
         //flow rate is sufficient - i.e. equal to requiredFlowRate
@@ -277,7 +283,7 @@ contract("TradeableCashflowOption", (accounts) => {
       let optionStatus = await app.optionActive.call();
       let optionReady = await app.optionReady.call();
       let sellerFlowRate = (await admin.details()).cfa.netFlow;
-      let contractLinkBalance = await link.balanceOf(app.address);
+      let contractDaiBalance = await dai.balanceOf(app.address);
 
       //need to make sure that the net flowRate of the option contract is 0
       assert.equal(
@@ -290,10 +296,10 @@ contract("TradeableCashflowOption", (accounts) => {
       assert.equal(optionReady, true, "option not ready");
       //need to make sure that the owner of the contract is receiving funds
       assert.equal(sellerFlowRate, 3858024609, "owner has incorrect flowRate");
-      //need to make sure that the contract is now holding the right amount of link
+      //need to make sure that the contract is now holding the right amount of dai
       assert.equal(
-        contractLinkBalance,
-        web3.utils.toWei("1", "ether"),
+        contractDaiBalance,
+        web3.utils.toWei("28", "ether"),
         "contract does not have correct link bal"
       );
     });
@@ -303,58 +309,58 @@ contract("TradeableCashflowOption", (accounts) => {
 
       const { admin, alice } = u;
       await checkBalance(alice);
-      let sellerLinkBalance = await link.balanceOf(admin.address);
-      console.log("link owner balance: " + sellerLinkBalance);
+      let sellerDaiBalance = await dai.balanceOf(admin.address);
+      console.log("dai owner balance: " + sellerDaiBalance);
 
-      //make sure buyer approves contract to spend their dai
-      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
+      //make sure buyer approves contract to spend their link
+      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
         from: alice.address,
       });
-      let aliceDaiBalance = await dai.balanceOf(alice.address);
-      let adminDaiBalance = await dai.balanceOf(admin.address);
       let aliceLinkBalance = await link.balanceOf(alice.address);
+      let adminLinkBalance = await link.balanceOf(admin.address);
+      let aliceDaiBalance = await dai.balanceOf(alice.address);
 
       //buyer runs exericse option to settle
       await app.exerciseOption({ from: alice.address });
 
-      let contractLinkBalanceAfter = await link.balanceOf(app.address);
-      console.log("contract link balance after: " + contractLinkBalanceAfter);
-
-      let aliceLinkBalanceAfter = await link.balanceOf(alice.address);
-      console.log(
-        "alice link balance after exercise: " + aliceLinkBalanceAfter
-      );
-      console.log("alice link balance before exercise: " + aliceLinkBalance);
-
-      let adminDaiBalanceAfter = await dai.balanceOf(admin.address);
-      console.log("admin dai balance after exercise: " + adminDaiBalanceAfter);
+      let contractDaiBalanceAfter = await dai.balanceOf(app.address);
+      console.log("contract dai balance after: " + contractDaiBalanceAfter);
 
       let aliceDaiBalanceAfter = await dai.balanceOf(alice.address);
+      console.log("alice dai balance after exercise: " + aliceDaiBalanceAfter);
+      console.log("alice dai balance before exercise: " + aliceDaiBalance);
+
+      let adminLinkBalanceAfter = await link.balanceOf(admin.address);
+      console.log(
+        "admin link balance after exercise: " + adminLinkBalanceAfter
+      );
+
+      let aliceLinkBalanceAfter = await link.balanceOf(alice.address);
 
       let buyerFlowRate = (await alice.details()).cfa.netFlow;
       let sellerFlowRate = (await admin.details()).cfa.netFlow;
 
-      //balance of link in contract should be zero
-      assert.equal(contractLinkBalanceAfter, 0, "funds have not left contract");
+      //balance of dai in contract should be zero
+      assert.equal(contractDaiBalanceAfter, 0, "funds have not left contract");
 
       assert.equal(buyerFlowRate, 0, "buyer flowRate should now be zero");
       assert.equal(sellerFlowRate, 0, "flowRate should now be zero");
 
       //make sure funds are settled
       assert.equal(
-        Number(aliceLinkBalance) + Number(web3.utils.toWei("1", "ether")),
-        aliceLinkBalanceAfter,
+        Number(aliceDaiBalance) + Number(web3.utils.toWei("28", "ether")),
+        aliceDaiBalanceAfter,
+        "dai balance not settled properly"
+      );
+      assert.equal(
+        Number(adminLinkBalanceAfter - adminLinkBalance),
+        web3.utils.toWei("1", "ether"),
         "link balance not settled properly"
       );
       assert.equal(
-        Number(adminDaiBalanceAfter - adminDaiBalance),
-        web3.utils.toWei("28", "ether"),
-        "dai balance not settled properly"
-      );
-      assert.equal(
-        Number(aliceDaiBalance - web3.utils.toWei("28", "ether")),
-        aliceDaiBalanceAfter,
-        "dai balance not settled properly"
+        Number(aliceLinkBalance - web3.utils.toWei("1", "ether")),
+        aliceLinkBalanceAfter,
+        "link balance not settled properly"
       );
 
       //write functionality in contract to turn off streams when option is settled
@@ -367,18 +373,18 @@ contract("TradeableCashflowOption", (accounts) => {
       //create option
       const { admin, alice } = u;
       await app.createOption(
-        link.address, //LINK rinkeby token
-        web3.utils.toWei("1", "ether"), //1 unit
-        18, //link has 18 decimals
-        mockPriceFeed.address, //the address of our mock price feed
+        web3.utils.toWei("28", "ether"), //underlyingAmount,
+        link.address, //purchasingAsset,
+        web3.utils.toWei("1", "ether"), //strikePrice,
+        18, //purchasingDecimals,
+        mockPriceFeed2.address, //the address of our mock price feed
         8, //price feed will return 8 decimal value
         "3858024609", //~100 per mo
         1669166376, //Nov 24, 2022,
-        web3.utils.toWei("28", "ether"), //strike price of this call option is $28
         { from: admin.address }
       );
-      //option seller approves link token transfer
-      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
+      //option seller approves dai token transfer
+      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
         from: admin.address,
       });
 
@@ -401,8 +407,8 @@ contract("TradeableCashflowOption", (accounts) => {
       let optionStatus = await app.optionActive.call();
       let optionReady = await app.optionReady.call();
       let sellerFlowRate = (await admin.details()).cfa.netFlow;
-      let contractLinkBalance = await link.balanceOf(app.address);
-      let adminLinkBalance = await link.balanceOf(admin.address);
+      let contractDaiBalance = await dai.balanceOf(app.address);
+      let adminDaiBalance = await dai.balanceOf(admin.address);
 
       //need to make sure that the net flowRate of the option contract is 0
       assert.equal(
@@ -419,11 +425,11 @@ contract("TradeableCashflowOption", (accounts) => {
         "3858024609",
         "owner has incorrect flowRate"
       );
-      //need to make sure that the contract is now holding the right amount of link
+      //need to make sure that the contract is now holding the right amount of dai
       assert.equal(
-        contractLinkBalance,
-        web3.utils.toWei("1", "ether"),
-        "contract does not have correct link bal"
+        contractDaiBalance,
+        web3.utils.toWei("28", "ether"),
+        "contract does not have correct dai bal"
       );
 
       //update flow
@@ -434,46 +440,46 @@ contract("TradeableCashflowOption", (accounts) => {
 
       let afterOptionStatus = await app.optionActive.call();
       let afterOptionReady = await app.optionReady.call();
-      let afterContractLinkBalance = await link.balanceOf(app.address);
-      let afterAdminLinkBalance = await link.balanceOf(admin.address);
+      let afterContractDaiBalance = await dai.balanceOf(app.address);
+      let afterAdminDaiBalance = await dai.balanceOf(admin.address);
 
       assert.equal(afterOptionStatus, false, "option should be deactivated");
       assert.equal(afterOptionReady, false, "option should no longer be ready");
       assert.equal(
-        afterContractLinkBalance,
+        afterContractDaiBalance,
         0,
-        "contract shouldn't have link any longer"
+        "contract shouldn't have dai any longer"
       );
       assert.equal(
-        Number(adminLinkBalance) + Number(web3.utils.toWei("1", "ether")),
-        afterAdminLinkBalance,
-        "admin should get all of their link back"
+        Number(adminDaiBalance) + Number(web3.utils.toWei("28", "ether")),
+        afterAdminDaiBalance,
+        "admin should get all of their dai back"
       );
     });
 
     it("Case #5 - Option is out of the money", async () => {
       const { admin, alice } = u;
       await app.createOption(
-        link.address, //LINK rinkeby token
-        web3.utils.toWei("1", "ether"), //1 unit
-        18, //link has 18 decimals
+        web3.utils.toWei("28", "ether"), //underlyingAmount,
+        link.address, //purchasingAsset,
+        web3.utils.toWei("1", "ether"), //strikePrice,
+        18, //purchasingDecimals,
         mockPriceFeed2.address, //the address of our mock price feed
         8, //price feed will return 8 decimal value
         "3858024609", //~100 per mo
         1669166376, //Nov 24, 2022,
-        web3.utils.toWei("28", "ether"), //strike price of this call option is $28
         { from: admin.address }
       );
-      //option seller approves link token transfer
-      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
+      //option seller approves dai token transfer
+      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
         from: admin.address,
       });
 
       //start flow
       await upgrade([alice]);
       await checkBalance(alice);
-      let sellerLinkBalance = await link.balanceOf(admin.address);
-      console.log("link owner balance: " + sellerLinkBalance);
+      let sellerDaiBalance = await dai.balanceOf(admin.address);
+      console.log("dai owner balance: " + sellerDaiBalance);
       console.log(app.address);
       await alice.flow({
         //flow rate is sufficient - i.e. equal to requiredFlowRate
@@ -481,7 +487,7 @@ contract("TradeableCashflowOption", (accounts) => {
         recipient: u.app,
       });
 
-      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
+      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
         from: alice.address,
       });
 
@@ -493,11 +499,11 @@ contract("TradeableCashflowOption", (accounts) => {
         console.log("did not work as expected");
       }
 
-      let contractFinalLinkBalance = await link.balanceOf(app.address);
-      console.log(contractFinalLinkBalance);
+      let contractFinalDaiBalance = await dai.balanceOf(app.address);
+      console.log(contractFinalDaiBalance);
 
       assert.equal(
-        contractFinalLinkBalance,
+        contractFinalDaiBalance,
         "0",
         "contract balance should be empty now"
       );
@@ -506,62 +512,62 @@ contract("TradeableCashflowOption", (accounts) => {
     xit("Case #6 - Option is past expiry", async () => {
       const { admin, alice } = u;
       await app.createOption(
-        link.address, //LINK token
-        web3.utils.toWei("1", "ether"), //1 unit
-        18, //link has 18 decimals
-        mockPriceFeed.address, //the address of our mock price feed
+        web3.utils.toWei("28", "ether"), //underlyingAmount,
+        link.address, //purchasingAsset,
+        web3.utils.toWei("1", "ether"), //strikePrice,
+        18, //purchasingDecimals,
+        mockPriceFeed2.address, //the address of our mock price feed
         8, //price feed will return 8 decimal value
-        "3858", //
+        "3858024609", //~100 per mo
         1669166376, //Nov 24, 2022,
-        web3.utils.toWei("28", "ether"), //strike price of this call option is $28
         { from: admin.address }
       );
-      //option seller approves link token transfer
-      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
+      //option seller approves dai token transfer
+      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
         from: admin.address,
       });
-      let aliceLinkBalBefore = await link.balanceOf(alice.address);
-      console.log("alice link bal before " + aliceLinkBalBefore);
+      let aliceDaiBalBefore = await dai.balanceOf(alice.address);
+      console.log("alice dai bal before " + aliceDaiBalBefore);
       //start flow
       await upgrade([alice]);
       await checkBalance(alice);
-      let sellerLinkBalance = await link.balanceOf(admin.address);
-      console.log("link owner balance: " + sellerLinkBalance);
+      let sellerDaiBalance = await dai.balanceOf(admin.address);
+      console.log("dai owner balance: " + sellerDaiBalance);
       await alice.flow({
         //flow rate is sufficient - i.e. equal to requiredFlowRate
         flowRate: "3858",
         recipient: u.app,
       });
-      let aliceLinkBal = await link.balanceOf(alice.address);
-      console.log("alice link bal after " + aliceLinkBal);
-      let beforeContractLinkBalance = await link.balanceOf(app.address);
+      let aliceDaiBal = await dai.balanceOf(alice.address);
+      console.log("alice dai bal after " + aliceDaiBal);
+      let beforeContractDaiBalance = await dai.balanceOf(app.address);
 
       console.log("go forward in time by one year");
       await traveler.advanceTimeAndBlock(ONE_YEAR_TIME);
-      await dai.approve(app.address, web3.utils.toWei("28", "ether"), {
+      await link.approve(app.address, web3.utils.toWei("1", "ether"), {
         from: alice.address,
       });
 
-      console.log("contract bal before exercise: " + beforeContractLinkBalance);
+      console.log("contract bal before exercise: " + beforeContractDaiBalance);
       //buyer runs exericse option to settle
       await app.exerciseOption({ from: alice.address });
 
       let afterOptionStatus = await app.optionActive.call();
       let afterOptionReady = await app.optionReady.call();
-      let afterContractLinkBalance = await link.balanceOf(app.address);
-      let afterAdminLinkBalance = await link.balanceOf(admin.address);
+      let afterContractDaiBalance = await dai.balanceOf(app.address);
+      let afterAdminDaiBalance = await dai.balanceOf(admin.address);
 
       assert.equal(afterOptionStatus, false, "option should be deactivated");
       assert.equal(afterOptionReady, false, "option should no longer be ready");
       assert.equal(
-        afterContractLinkBalance,
+        afterContractDaiBalance,
         0,
-        "contract shouldn't have link any longer"
+        "contract shouldn't have dai any longer"
       );
       assert.equal(
-        Number(adminLinkBalance) + Number(web3.utils.toWei("1", "ether")),
-        afterAdminLinkBalance,
-        "admin should get all of their link back"
+        Number(adminDaiBalance) + Number(web3.utils.toWei("28", "ether")),
+        afterAdminDaiBalance,
+        "admin should get all of their dai back"
       );
     });
   });
