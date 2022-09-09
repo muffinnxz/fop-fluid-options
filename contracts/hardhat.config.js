@@ -1,6 +1,7 @@
 // require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-truffle5");
 require("hardhat-deploy");
+require("@nomiclabs/hardhat-waffle");
 
 require("dotenv").config();
 
@@ -39,10 +40,14 @@ module.exports = {
     //     network_id: "*",
     //     port: 8545,
     // },
-    // goerli: {
-    //   url: `${process.env.GOERLI_ALCHEMY_URL}`,
-    //   accounts: [`0x${process.env.GOERLI_DEPLOYER_PRIVATE_KEY}`],
-    // },
+    goerli: {
+      url: `${process.env.GOERLI_ALCHEMY_URL}`,
+      accounts: [`0x${process.env.GOERLI_DEPLOYER_PRIVATE_KEY}`],
+      // allowUnlimitedContractSize: true,
+    },
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
   },
   namedAccounts: {
     deployer: {

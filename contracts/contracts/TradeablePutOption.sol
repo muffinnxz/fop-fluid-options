@@ -27,11 +27,13 @@ contract TradeablePutOption is ERC721, RedirectAllPutOption {
 
     //now I will insert a nice little hook in the _transfer, including the RedirectAll function I need
     function _beforeTokenTransfer(
-        address, from
+        address from,
         address to,
         uint256 /*tokenId*/
     ) internal override {
         _changeReceiver(to);
-        factory.changePutOptionOwner(address(this),from,to);
+        if (from != address(0)) {
+            factory.changePutOptionOwner(address(this), from, to);
+        }
     }
 }
