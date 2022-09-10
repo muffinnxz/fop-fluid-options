@@ -1,2 +1,2 @@
 # fop-fluid-options
- Super Fluid Options for ETHOnline2022
+ Streaming Options Marketplace submitted for ETHOnline2022
