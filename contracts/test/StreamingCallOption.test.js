@@ -6,14 +6,14 @@ const deployFramework = require("@superfluid-finance/ethereum-contracts/scripts/
 const deployTestToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-test-token");
 const deploySuperToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-super-token");
 const SuperfluidSDK = require("@superfluid-finance/js-sdk");
-const TradeableCashflowOption = artifacts.require("TradeableCashflowOption");
+const TradeableCallOption = artifacts.require("TradeableCallOption");
 const MockV3Aggregator = artifacts.require("MockV3Aggregator");
 
 const traveler = require("ganache-time-traveler");
 // const { it } = require("ethers/wordlists");
 const TEST_TRAVEL_TIME = 3600 * 2; // 1 hours
 const ONE_YEAR_TIME = 3600 * 2 * 24 * 366; //one year and one day
-contract("TradeableCashflowOption", (accounts) => {
+contract("TradeableCallOption", (accounts) => {
   const errorHandler = (err) => {
     if (err) throw err;
   };
@@ -104,7 +104,7 @@ contract("TradeableCashflowOption", (accounts) => {
     console.log(sf.host.address);
     console.log(sf.agreements.cfa.address);
     console.log(daix.address);
-    app = await TradeableCashflowOption.new(
+    app = await TradeableCallOption.new(
       //first param is owner of option
       u.admin.address,
       "StreamingCallOption",

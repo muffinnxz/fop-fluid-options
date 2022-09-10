@@ -11,13 +11,13 @@ const cfaJSON = require("../artifacts/@superfluid-finance/ethereum-contracts/con
 const cfaABI = cfaJSON.abi;
 const cfaAddress = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
 
-const tradeableCashflowOptionJSON = require("../artifacts/contracts/TradeableCashflowOption.sol/TradeableCashflowOption.json");
-const tradeableCashflowOptionABI = tradeableCashflowOptionJSON.abi; 
+const tradeableCallOptionJSON = require("../artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json");
+const tradeableCallOptionABI = tradeableCallOptionJSON.abi; 
 
 //temporarily hardcode contract address and sender address
 //need to manually enter contract address and sender address here
-const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCashflowOption.json");
-const tradeableCashflowOptionAddress = deployedTradeableCashflowOption.address;
+const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCallOption.json");
+const tradeableCallOptionAddress = deployedTradeableCashflowOption.address;
 
 //your address here:
 const _sender = "0x9421FE8eCcAfad76C3A9Ec8f9779fAfA05A836B3";
@@ -31,7 +31,7 @@ async function main() {
   //create contract instances for each of these
   const host = new web3.eth.Contract(hostABI, hostAddress);
   const cfa = new web3.eth.Contract(cfaABI, cfaAddress);
-  const tradeableCashflowOption = new web3.eth.Contract(tradeableCashflowOptionABI, tradeableCashflowOptionAddress);
+  const TradeableCallOption = new web3.eth.Contract(tradeableCallOptionABI, tradeableCallOptionAddress);
   
   const fDAIx = "0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90";
   const userData = web3.eth.abi.encodeParameter('string', 'HODL BTC');
@@ -45,7 +45,7 @@ async function main() {
      .createFlow(
       fDAIx,
       // _sender,
-      tradeableCashflowOptionAddress,
+      tradeableCallOptionAddress,
       "38580246913585",
       "0x"
      )

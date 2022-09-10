@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import {TradeableCashflowOption} from "./TradeableCashflowOption.sol";
+import {TradeableCallOption} from "./TradeableCallOption.sol";
 import {ISuperToken, IConstantFlowAgreementV1, ISuperfluid} from "./RedirectAllPutOption.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -32,7 +32,7 @@ contract OptionFactory {
         ISuperToken acceptedToken,
         ERC20 dai
     ) public {
-        TradeableCashflowOption _option = new TradeableCashflowOption(
+        TradeableCallOption _option = new TradeableCallOption(
             owner,
             _name,
             _symbol,

@@ -14,13 +14,13 @@ const cfaJSON = require("../artifacts/@superfluid-finance/ethereum-contracts/con
 const cfaABI = cfaJSON.abi;
 const cfaAddress = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
 
-const tradeableCashflowOptionJSON = require("../artifacts/contracts/TradeableCashflowOption.sol/TradeableCashflowOption.json");
-const tradeableCashflowOptionABI = tradeableCashflowOptionJSON.abi; 
+const tradeableCallOptionJSON = require("../artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json");
+const tradeableCallOptionABI = tradeableCallOptionJSON.abi; 
 
 //temporarily hardcode contract address and sender address
 //need to manually enter contract address and sender address here
-const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCashflowOption.json");
-const tradeableCashflowOptionAddress = deployedTradeableCashflowOption.address;
+const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCallOption.json");
+const tradeableCallOptionAddress = deployedTradeableCashflowOption.address;
 
 //address of owner of option here..need to change this
 const _sender = "0x5966aa11c794893774a382d9a19743B8be6BFFd1";
@@ -33,7 +33,7 @@ async function main() {
     //create contract instances for each of these
     const host = new web3.eth.Contract(hostABI, hostAddress);
     const cfa = new web3.eth.Contract(cfaABI, cfaAddress);
-    const tradeableCashflowOption = new web3.eth.Contract(tradeableCashflowOptionABI, tradeableCashflowOptionAddress);
+    const TradeableCallOption = new web3.eth.Contract(tradeableCallOptionABI, tradeableCallOptionAddress);
     
     const fDAIx = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
   
@@ -51,13 +51,13 @@ async function main() {
         //     uint256 expirationDate, 
         //     int256 strikePrice)  
 
-        let underlyingAsset = await tradeableCashflowOption.methods._underlyingAsset().call();
-        let requiredFlowRate = await tradeableCashflowOption.methods._requiredFlowRate().call();
-        let expirationDate = await tradeableCashflowOption.methods._expirationDate().call();
-        let strikePrice = await tradeableCashflowOption.methods._strikePrice().call();
-        let optionReady = await tradeableCashflowOption.methods.optionReady().call();
-        let optionActive = await tradeableCashflowOption.methods.optionActive().call();
-        let underlyingAmount = await tradeableCashflowOption.methods._underlyingAmount().call();
+        let underlyingAsset = await TradeableCallOption.methods._underlyingAsset().call();
+        let requiredFlowRate = await TradeableCallOption.methods._requiredFlowRate().call();
+        let expirationDate = await TradeableCallOption.methods._expirationDate().call();
+        let strikePrice = await TradeableCallOption.methods._strikePrice().call();
+        let optionReady = await TradeableCallOption.methods.optionReady().call();
+        let optionActive = await TradeableCallOption.methods.optionActive().call();
+        let underlyingAmount = await TradeableCallOption.methods._underlyingAmount().call();
 
 
         console.log(`Underlying Asset: ${underlyingAsset}`);
