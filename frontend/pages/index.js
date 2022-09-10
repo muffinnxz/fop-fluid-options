@@ -4,7 +4,7 @@ import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol
 import { useState, useEffect } from "react";
 
 export default function Home() {
-  const OptionFactoryAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const OptionFactoryAddress = "0xa14CF1Bcb4A21F4C8723809DA1A5184BFC36A743";
 
   const [callOptions, setCallOptions] = useState([]);
 

@@ -10,7 +10,15 @@ async function main() {
 
   await optionFactory.deployed();
 
+  const OptionPutFactory = await hre.ethers.getContractFactory(
+    "OptionPutFactory"
+  );
+  const optionPutFactory = await OptionPutFactory.deploy();
+
+  await optionFactory.deployed();
+
   console.log("Option Factory deployed to:", optionFactory.address);
+  console.log("Option Put Factory deployed to:", optionPutFactory.address);
 }
 main()
   .then(() => process.exit(0))

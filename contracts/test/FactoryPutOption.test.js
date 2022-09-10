@@ -7,7 +7,7 @@ const deployTestToken = require("@superfluid-finance/ethereum-contracts/scripts/
 const deploySuperToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-super-token");
 const SuperfluidSDK = require("@superfluid-finance/js-sdk");
 const TradeableCashflowOption = artifacts.require("TradeableCashflowOption");
-const OptionFactory = artifacts.require("OptionFactory");
+const OptionPutFactory = artifacts.require("OptionPutFactory");
 const MockV3Aggregator = artifacts.require("MockV3Aggregator");
 
 const traveler = require("ganache-time-traveler");
@@ -106,7 +106,7 @@ contract("TradeableCashflowOption", (accounts) => {
     // console.log(sf.host.address);
     // console.log(sf.agreements.cfa.address);
     // console.log(daix.address);
-    app = await OptionFactory.new();
+    app = await OptionPutFactory.new();
 
     u.app = sf.user({ address: app.address, token: daix.address });
     u.app.alias = "App";
@@ -193,12 +193,13 @@ contract("TradeableCashflowOption", (accounts) => {
     );
     return true;
   }
-  describe("Creating Call Option From Factory", async function () {
-    it("Case 1 - Owner calls mintCallOption()", async () => {
+
+  describe("Creating Put Option From Factory", async function () {
+    it("Case 1 - Owner calls mintPutOption()", async () => {
       const { constants } = require("@openzeppelin/test-helpers");
       const { admin } = u;
-      // mint call option from factory
-      await app.mintCallOption(
+      // mint put option from factory
+      await app.mintPutOption(
         u.admin.address,
         "StreamingCallOption",
         "OPTx",
@@ -209,152 +210,62 @@ contract("TradeableCashflowOption", (accounts) => {
         { from: admin.address }
       );
       // get all call/put options
-      let getAllCallOption = await app.getCallOptions.call();
-      // let getAllPutOption = await app.getPutOptions.call();
+      let getAllPutOption = await app.getPutOptions.call();
       // get all my call/put options
-      let getAllMyCallOption = await app.getCallOptionsByWallet.call(
+      let getAllMyPutOption = await app.getPutOptionsByWallet.call(
         admin.address
       );
-      // let getAllMyPutOption = await app.getPutOptionsByWallet.call(
-      //   admin.address
-      // );
 
       assert.notEqual(
-        getAllCallOption,
+        getAllPutOption,
         constants.ZERO_ADDRESS,
-        "Call Option not created yet"
+        "Put Option not created yet"
       );
-      // assert.equal(getAllPutOption.length, 0, "There is put in all options");
       assert.deepEqual(
-        getAllMyCallOption,
-        getAllCallOption,
-        "Call Option not created yet and not mine"
+        getAllMyPutOption,
+        getAllPutOption,
+        "Put Option not created yet and not mine"
       );
-
-      // assert.deepEqual(getAllMyPutOption, [], "There not mine put option");
     });
 
-    it("Case #2 - User transfer call option", async () => {
+    it("Case #2 - User transfer put option", async () => {
       const { admin, alice } = u;
 
       // get all options and all my options
-      let getAllCallOption = await app.getCallOptions.call();
-      let getAllMyCallOption = await app.getCallOptionsByWallet.call(
+      let getAllPutOption = await app.getPutOptions.call();
+      let getAllMyPutOption = await app.getPutOptionsByWallet.call(
         admin.address
       );
-      // get my callOption in form of contract
-      callOption = await ethers.getContractAt(
+      // get my putOption in form of contract
+      putOption = await ethers.getContractAt(
         "TradeableCashflowOption",
-        getAllCallOption[0]
+        getAllPutOption[0]
       );
 
       //approve for transfer
-      await callOption.approve(app.address, 1, {
+      await putOption.approve(app.address, 1, {
         from: admin.address,
       });
       // transfer to alice
-      callOption.transferFrom(admin.address, alice.address, 1);
+      putOption.transferFrom(admin.address, alice.address, 1);
 
-      // check ALL call OPTIONS
-      let getAllCallOption2 = await app.getCallOptions.call();
-      // check alice call option
-      let getAllMyCallOption2 = await app.getCallOptionsByWallet.call(
+      // check ALL put OPTIONS
+      let getAllPutOption2 = await app.getPutOptions.call();
+      // check alice put option
+      let getAllMyPutOption2 = await app.getPutOptionsByWallet.call(
         admin.address
       );
-      assert.deepEqual(
-        getAllCallOption,
-        getAllCallOption2,
-        "It's not the same"
-      );
-      assert.deepEqual(getAllMyCallOption2, [], "Now Empty");
+      assert.deepEqual(getAllPutOption, getAllPutOption2, "It's not the same");
+      assert.deepEqual(getAllMyPutOption2, [], "Now Empty");
 
-      let getAllMyCallOption3 = await app.getCallOptionsByWallet.call(
+      let getAllMyPutOption3 = await app.getPutOptionsByWallet.call(
         alice.address
       );
       assert.deepEqual(
-        getAllMyCallOption,
-        getAllMyCallOption3,
+        getAllMyPutOption,
+        getAllMyPutOption3,
         "Alice doesn't get Nft"
       );
     });
   });
-
-  // describe("Creating Put Option From Factory", async function () {
-  //   it("Case 1 - Owner calls mintPutOption()", async () => {
-  //     const { constants } = require("@openzeppelin/test-helpers");
-  //     const { admin } = u;
-  //     // mint put option from factory
-  //     await app.mintPutOption(
-  //       u.admin.address,
-  //       "StreamingCallOption",
-  //       "OPTx",
-  //       sf.host.address,
-  //       sf.agreements.cfa.address,
-  //       daix.address,
-  //       dai.address,
-  //       { from: admin.address }
-  //     );
-  //     // get all call/put options
-  //     let getAllCallOption = await app.getCallOptions.call();
-  //     let getAllPutOption = await app.getPutOptions.call();
-  //     // get all my call/put options
-  //     let getAllMyCallOption = await app.getCallOptionsByWallet.call(
-  //       admin.address
-  //     );
-  //     let getAllMyPutOption = await app.getPutOptionsByWallet.call(
-  //       admin.address
-  //     );
-
-  //     assert.notEqual(
-  //       getAllPutOption,
-  //       constants.ZERO_ADDRESS,
-  //       "Put Option not created yet"
-  //     );
-  //     assert.deepEqual(
-  //       getAllMyPutOption,
-  //       getAllPutOption,
-  //       "Put Option not created yet and not mine"
-  //     );
-  //   });
-
-  //   it("Case #2 - User transfer put option", async () => {
-  //     const { admin, alice } = u;
-
-  //     // get all options and all my options
-  //     let getAllPutOption = await app.getPutOptions.call();
-  //     let getAllMyPutOption = await app.getPutOptionsByWallet.call(
-  //       admin.address
-  //     );
-  //     // get my putOption in form of contract
-  //     putOption = await ethers.getContractAt(
-  //       "TradeableCashflowOption",
-  //       getAllPutOption[0]
-  //     );
-
-  //     //approve for transfer
-  //     await putOption.approve(app.address, 1, {
-  //       from: admin.address,
-  //     });
-  //     // transfer to alice
-  //     putOption.transferFrom(admin.address, alice.address, 1);
-
-  //     // check ALL put OPTIONS
-  //     let getAllPutOption2 = await app.getPutOptions.call();
-  //     // check alice put option
-  //     let getAllMyPutOption2 = await app.getPutOptionsByWallet.call(
-  //       admin.address
-  //     );
-  //     assert.deepEqual(getAllPutOption, getAllPutOption2, "It's not the same");
-  //     assert.deepEqual(getAllMyPutOption2, [], "Now Empty");
-
-  //     let getAllMyPutOption3 = await app.getPutOptionsByWallet.call(
-  //       alice.address
-  //     );
-  //     assert.deepEqual(
-  //       getAllMyPutOption,
-  //       getAllMyPutOption3,
-  //       "Alice doesn't get Nft"
-  //     );
-  //   });
-  // });
 });
