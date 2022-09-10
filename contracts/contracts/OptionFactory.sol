@@ -2,14 +2,13 @@
 pragma solidity 0.8.13;
 
 import {TradeableCallOption} from "./TradeableCallOption.sol";
-import {ISuperToken, IConstantFlowAgreementV1, ISuperfluid} from "./RedirectAllPutOption.sol";
+import {ISuperToken, IConstantFlowAgreementV1, ISuperfluid} from "./RedirectAllCallOption.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract OptionFactory {
     mapping(address => address[]) public walletToCallOptions;
 
-    address[] putOptions;
-    address[] callOptions;
+    address[] public callOptions;
 
     function getCallOptions() public view returns (address[] memory) {
         return callOptions;
