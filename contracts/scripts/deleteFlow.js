@@ -11,13 +11,13 @@ const cfaJSON = require("../artifacts/@superfluid-finance/ethereum-contracts/con
 const cfaABI = cfaJSON.abi;
 const cfaAddress = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
 
-const tradeableCashflowOptionJSON = require("../artifacts/contracts/TradeableCashflowOption.sol/TradeableCashflowOption.json");
-const tradeableCashflowOptionABI = tradeableCashflowOptionJSON.abi; 
+const tradeableCallOptionJSON = require("../artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json");
+const tradeableCallOptionABI = tradeableCallOptionJSON.abi; 
 
 //temporarily hardcode contract address and sender address
 //need to manually enter contract address and sender address here
-const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCashflowOption.json");
-const tradeableCashflowOptionAddress = deployedTradeableCashflowOption.address;
+const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCallOption.json");
+const tradeableCallOptionAddress = deployedTradeableCashflowOption.address;
 
 //delete a flow
 async function main() {
@@ -27,7 +27,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(process.env.RINKEBY_ALCHEM
   //create contract instances for each of these
   const host = new web3.eth.Contract(hostABI, hostAddress);
   const cfa = new web3.eth.Contract(cfaABI, cfaAddress);
-  const tradeableCashflowOption = new web3.eth.Contract(tradeableCashflowOptionABI, tradeableCashflowOptionAddress);
+  const TradeableCallOption = new web3.eth.Contract(tradeableCallOptionABI, tradeableCallOptionAddress);
 
   //your address here
   const _sender = "0x9421FE8eCcAfad76C3A9Ec8f9779fAfA05A836B3"
@@ -44,7 +44,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(process.env.RINKEBY_ALCHEM
      .deleteFlow(
       fDAIx,
       _sender,
-      tradeableCashflowOptionAddress,
+      tradeableCallOptionAddress,
       "0x"
      )
      .encodeABI())

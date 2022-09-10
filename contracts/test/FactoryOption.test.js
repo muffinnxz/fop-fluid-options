@@ -6,7 +6,7 @@ const deployFramework = require("@superfluid-finance/ethereum-contracts/scripts/
 const deployTestToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-test-token");
 const deploySuperToken = require("@superfluid-finance/ethereum-contracts/scripts/deploy-super-token");
 const SuperfluidSDK = require("@superfluid-finance/js-sdk");
-const TradeableCashflowOption = artifacts.require("TradeableCashflowOption");
+const TradeableCallOption = artifacts.require("TradeableCallOption");
 const OptionFactory = artifacts.require("OptionFactory");
 const MockV3Aggregator = artifacts.require("MockV3Aggregator");
 
@@ -15,7 +15,7 @@ const { assert } = require("chai");
 // const { it } = require("ethers/wordlists");
 const TEST_TRAVEL_TIME = 3600 * 2; // 1 hours
 const ONE_YEAR_TIME = 3600 * 2 * 24 * 366; //one year and one day
-contract("TradeableCashflowOption", (accounts) => {
+contract("TradeableCallOption", (accounts) => {
   const errorHandler = (err) => {
     if (err) throw err;
   };
@@ -244,7 +244,7 @@ contract("TradeableCashflowOption", (accounts) => {
       );
       // get my callOption in form of contract
       callOption = await ethers.getContractAt(
-        "TradeableCashflowOption",
+        "TradeableCallOption",
         getAllCallOption[0]
       );
 
@@ -327,7 +327,7 @@ contract("TradeableCashflowOption", (accounts) => {
       );
       // get my putOption in form of contract
       putOption = await ethers.getContractAt(
-        "TradeableCashflowOption",
+        "TradeableCallOption",
         getAllPutOption[0]
       );
 

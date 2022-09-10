@@ -15,13 +15,13 @@ const cfaJSON = require("../artifacts/@superfluid-finance/ethereum-contracts/con
 const cfaABI = cfaJSON.abi;
 const cfaAddress = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
 
-const tradeableCashflowOptionJSON = require("../artifacts/contracts/TradeableCashflowOption.sol/TradeableCashflowOption.json");
-const tradeableCashflowOptionABI = tradeableCashflowOptionJSON.abi; 
+const tradeableCallOptionJSON = require("../artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json");
+const tradeableCallOptionABI = tradeableCallOptionJSON.abi; 
 
 //temporarily hardcode contract address and sender address
 //need to manually enter contract address and sender address here
-const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCashflowOption.json");
-const tradeableCashflowOptionAddress = deployedTradeableCashflowOption.address;
+const deployedTradeableCashflowOption = require("../deployments/rinkeby/TradeableCallOption.json");
+const tradeableCallOptionAddress = deployedTradeableCashflowOption.address;
 
 //address of owner of option here..need to change this
 const _sender = "0x5966aa11c794893774a382d9a19743B8be6BFFd1";
@@ -34,7 +34,7 @@ async function main() {
     //create contract instances for each of these
     const host = new web3.eth.Contract(hostABI, hostAddress);
     const cfa = new web3.eth.Contract(cfaABI, cfaAddress);
-    const tradeableCashflowOption = new web3.eth.Contract(tradeableCashflowOptionABI, tradeableCashflowOptionAddress);
+    const TradeableCallOption = new web3.eth.Contract(tradeableCallOptionABI, tradeableCallOptionAddress);
     
     const fDAIx = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
   
@@ -44,7 +44,7 @@ async function main() {
     //create flow from sender to tradeable cashflow address
     async function startOption() {
         
-        let txData = (await tradeableCashflowOption.methods.createOption(
+        let txData = (await TradeableCallOption.methods.createOption(
             "0x01BE23585060835E02B77ef475b0Cc51aA1e0709", //LINK rinkeby token
             web3.utils.toWei("1", "ether"), //1 unit
             18, //link has 18 decimals
@@ -56,9 +56,9 @@ async function main() {
         ).encodeABI());
 
   
-    //send the tx to the tradeableCashflowOption
+    //send the tx to the TradeableCallOption
       let tx = {
-        'to': tradeableCashflowOptionAddress,
+        'to': tradeableCallOptionAddress,
         'gas': 3000000,
         'nonce': nonce,
         'data': txData

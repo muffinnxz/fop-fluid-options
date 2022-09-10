@@ -12,7 +12,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deployer } = await getNamedAccounts();
   console.log(deployer);
 
-  await deploy("TradeableCashflowOption", {
+  await deploy("TradeableCallOption", {
     from: deployer,
     args: [owner, 'super option', 'OPTx', host, cfa, fDAIx],
     log: true,
@@ -61,4 +61,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
   */
 };
-module.exports.tags = ["TradeableCashflowOption"];
+module.exports.tags = ["TradeableCallOption"];

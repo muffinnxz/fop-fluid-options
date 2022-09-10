@@ -6,7 +6,7 @@ import {OptionFactory} from "./OptionFactory.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract TradeableCashflowOption is ERC721, RedirectAllCallOption {
+contract TradeableCallOption is ERC721, RedirectAllCallOption {
     OptionFactory public factory;
 
     constructor(
