@@ -6,10 +6,8 @@ import { useState, useEffect } from "react";
 import ConnectWallet from "../components/ConnectButton";
 
 export default function Home() {
-  const CallFactoryAddress = "0x26A13d6216667B33D41Da85849D9aC91B5c2985b";
-  const PutFactoryAddress = "0x78bDbe64882E16E98934d34c76D0a443f814081D";
-  const host = "0x22ff293e14F1EC3A09B137e9e06084AFd63adDF9";
-  const cfa = "0xEd6BcbF6907D4feEEe8a8875543249bEa9D308E8";
+  const CallFactoryAddress = "0x08CA80FbC61e8C9751a7dD21F2217501ade75BE0";
+  const PutFactoryAddress = "0x21EF4df14201E5fA136a2b5966F4907f9f90C86b";
   const fDAIx = "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00";
   const dai = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
 
@@ -83,15 +81,7 @@ export default function Home() {
         // e.target[0].value == "call"
         //   ?
         let addr = await signer.getAddress();
-        const data = await contract.mintCallOption(
-          addr,
-          "test1",
-          "ts1",
-          host,
-          cfa,
-          fDAIx,
-          dai
-        );
+        const data = await contract.mintCallOption(addr, "test1", fDAIx, dai);
         // :
         // await contract.mintPutOption(
         //   await signer.getAddress(),
@@ -120,6 +110,14 @@ export default function Home() {
           <input placeholder="call/put" required></input>
           <input placeholder="name" required></input>
           <input placeholder="symbol" required></input>
+          <input placeholder="underlyamount" required></input>
+          <input placeholder="underlyasset" required></input>
+          <input placeholder="strike price" required></input>
+          <input placeholder="purchase decimal" required></input>
+          <input placeholder="price feed" required></input>
+          <input placeholder="price feed decimal" required></input>
+          <input placeholder="flow rate per sec" required></input>
+          <input placeholder="expiration" type="date" required></input>
           <button>submit</button>
         </form>
       </section>
