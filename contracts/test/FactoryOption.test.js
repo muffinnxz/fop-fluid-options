@@ -210,14 +210,11 @@ contract("TradeableCashflowOption", (accounts) => {
       );
       // get all call/put options
       let getAllCallOption = await app.getCallOptions.call();
-      // let getAllPutOption = await app.getPutOptions.call();
+
       // get all my call/put options
       let getAllMyCallOption = await app.getCallOptionsByWallet.call(
         admin.address
       );
-      // let getAllMyPutOption = await app.getPutOptionsByWallet.call(
-      //   admin.address
-      // );
 
       assert.notEqual(
         getAllCallOption,
@@ -278,83 +275,4 @@ contract("TradeableCashflowOption", (accounts) => {
       );
     });
   });
-
-  // describe("Creating Put Option From Factory", async function () {
-  //   it("Case 1 - Owner calls mintPutOption()", async () => {
-  //     const { constants } = require("@openzeppelin/test-helpers");
-  //     const { admin } = u;
-  //     // mint put option from factory
-  //     await app.mintPutOption(
-  //       u.admin.address,
-  //       "StreamingCallOption",
-  //       "OPTx",
-  //       sf.host.address,
-  //       sf.agreements.cfa.address,
-  //       daix.address,
-  //       dai.address,
-  //       { from: admin.address }
-  //     );
-  //     // get all call/put options
-  //     let getAllCallOption = await app.getCallOptions.call();
-  //     let getAllPutOption = await app.getPutOptions.call();
-  //     // get all my call/put options
-  //     let getAllMyCallOption = await app.getCallOptionsByWallet.call(
-  //       admin.address
-  //     );
-  //     let getAllMyPutOption = await app.getPutOptionsByWallet.call(
-  //       admin.address
-  //     );
-
-  //     assert.notEqual(
-  //       getAllPutOption,
-  //       constants.ZERO_ADDRESS,
-  //       "Put Option not created yet"
-  //     );
-  //     assert.deepEqual(
-  //       getAllMyPutOption,
-  //       getAllPutOption,
-  //       "Put Option not created yet and not mine"
-  //     );
-  //   });
-
-  //   it("Case #2 - User transfer put option", async () => {
-  //     const { admin, alice } = u;
-
-  //     // get all options and all my options
-  //     let getAllPutOption = await app.getPutOptions.call();
-  //     let getAllMyPutOption = await app.getPutOptionsByWallet.call(
-  //       admin.address
-  //     );
-  //     // get my putOption in form of contract
-  //     putOption = await ethers.getContractAt(
-  //       "TradeableCashflowOption",
-  //       getAllPutOption[0]
-  //     );
-
-  //     //approve for transfer
-  //     await putOption.approve(app.address, 1, {
-  //       from: admin.address,
-  //     });
-  //     // transfer to alice
-  //     putOption.transferFrom(admin.address, alice.address, 1);
-
-  //     // check ALL put OPTIONS
-  //     let getAllPutOption2 = await app.getPutOptions.call();
-  //     // check alice put option
-  //     let getAllMyPutOption2 = await app.getPutOptionsByWallet.call(
-  //       admin.address
-  //     );
-  //     assert.deepEqual(getAllPutOption, getAllPutOption2, "It's not the same");
-  //     assert.deepEqual(getAllMyPutOption2, [], "Now Empty");
-
-  //     let getAllMyPutOption3 = await app.getPutOptionsByWallet.call(
-  //       alice.address
-  //     );
-  //     assert.deepEqual(
-  //       getAllMyPutOption,
-  //       getAllMyPutOption3,
-  //       "Alice doesn't get Nft"
-  //     );
-  //   });
-  // });
 });
