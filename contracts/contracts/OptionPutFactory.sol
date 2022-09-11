@@ -31,14 +31,14 @@ contract OptionPutFactory {
         string memory _name,
         ISuperToken acceptedToken,
         ERC20 dai,
-        uint256 underlyingAmount,
         ERC20 purchasingAsset,
-        int256 strikePrice,
+        uint256 underlyingAmount,
         uint8 purchasingDecimals,
         AggregatorV3Interface priceFeed,
         uint8 priceFeedDecimals,
         int96 requiredFlowRate,
-        uint256 expirationDate
+        uint256 expirationDate,
+        int256 strikePrice
     ) public {
         TradeablePutOption _option = new TradeablePutOption(
             owner,
@@ -51,14 +51,14 @@ contract OptionPutFactory {
         );
 
         _option.createOption(
-            underlyingAmount,
             purchasingAsset,
-            strikePrice,
+            underlyingAmount,
             purchasingDecimals,
             priceFeed,
             priceFeedDecimals,
             requiredFlowRate,
-            expirationDate
+            expirationDate,
+            strikePrice
         );
 
         walletToPutOptions[owner].push(address(_option));
