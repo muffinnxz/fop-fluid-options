@@ -158,7 +158,9 @@ export default function Home() {
       {callOptions.map((co, index) => {
         return (
           <div>
-            {index + 1} address: {co}
+            <a href={`/call/${co}`}>
+              {index + 1} address: {co}
+            </a>
           </div>
         );
       })}
