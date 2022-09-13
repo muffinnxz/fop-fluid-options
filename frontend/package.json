@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chainlink/contracts": "^0.4.1",
     "@openzeppelin/contracts": "^4.7.2",
     "@rainbow-me/rainbowkit": "^0.4.5",
     "@reduxjs/toolkit": "^1.8.5",

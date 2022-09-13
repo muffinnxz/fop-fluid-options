@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
 import TradeableCallOption from "../../../contracts/artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json";
 import { Framework } from "@superfluid-finance/sdk-core";
+import LinkToken from "../../abis/LinkToken.json";
 
 export default function User() {
     const router = useRouter();
@@ -44,9 +45,16 @@ export default function User() {
             TradeableCallOption.abi,
             signer
         );
+        const link = new ethers.Contract(
+            "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+            LinkToken.result,
+            signer
+        )
 
         try {
-            let tx = await contract._activateOption();
+            const underlyingAmount = await contract._underlyingAmount();
+            console.log(underlyingAmount);
+            let tx = await link.approve(router.query.optionAddress, underlyingAmount);
             await tx.wait();
         } catch (err) {
             console.log("Error: ", err);
