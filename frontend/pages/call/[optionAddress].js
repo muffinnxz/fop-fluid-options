@@ -49,22 +49,26 @@ export default function User() {
             "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             LinkToken.result,
             signer
-        )
+        );
 
         try {
             const underlyingAmount = await contract._underlyingAmount();
-            console.log(underlyingAmount);
-            let tx = await link.approve(router.query.optionAddress, underlyingAmount);
+            let tx = await link.approve(
+                router.query.optionAddress,
+                underlyingAmount
+            );
             await tx.wait();
         } catch (err) {
             console.log("Error: ", err);
         }
     };
 
-    const createFlow = async () => {
-        console.log("Start create flow...");
+    //where the Superfluid logic takes place
+    async function createNewFlow(recipient, flowRate) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
+
         const signer = provider.getSigner();
+
         const chainId = await window.ethereum.request({
             method: "eth_chainId",
         });
@@ -73,21 +77,15 @@ export default function User() {
             provider: provider,
         });
 
-        const contract = new ethers.Contract(
-            router.query.optionAddress,
-            TradeableCallOption.abi,
-            provider
-        );
-
         const DAIxContract = await sf.loadSuperToken("fDAIx");
         const DAIx = DAIxContract.address;
 
         try {
-            const flowRate = await contract._requiredFlowRate();
             const createFlowOperation = sf.cfaV1.createFlow({
-                receiver: router.query.optionAddress,
-                flowRate: ethers.BigNumber.from(flowRate).toString(),
+                receiver: recipient,
+                flowRate: flowRate,
                 superToken: DAIx,
+                // userData?: string
             });
 
             console.log("Creating your stream...");
@@ -97,12 +95,12 @@ export default function User() {
 
             console.log(
                 `Congrats - you've just created a money stream!
-                    View Your Stream At: https://app.superfluid.finance/dashboard/${router.query.optionAddress}
-                    Network: Kovan
-                    Super Token: DAIx
-                    Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
-                    Receiver: ${router.query.optionAddress},
-                    FlowRate: ${flowRate}
+                View Your Stream At: https://app.superfluid.finance/dashboard/${recipient}
+                Network: Kovan
+                Super Token: DAIx
+                Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
+                Receiver: ${recipient},
+                FlowRate: ${flowRate}
                 `
             );
         } catch (error) {
@@ -111,6 +109,25 @@ export default function User() {
             );
             console.error(error);
         }
+    }
+
+    const createFlow = async () => {
+        console.log("Start create flow...");
+        const provider = ethers.getDefaultProvider("goerli");
+        const contract = new ethers.Contract(
+            router.query.optionAddress,
+            TradeableCallOption.abi,
+            provider
+        );
+        const flowRate = await contract._requiredFlowRate();
+        console.log(
+            router.query.optionAddress,
+            ethers.BigNumber.from(flowRate).toString()
+        );
+        await createNewFlow(
+            router.query.optionAddress,
+            ethers.BigNumber.from(flowRate).toString()
+        );
     };
 
     return (
