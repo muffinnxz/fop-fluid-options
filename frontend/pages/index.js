@@ -4,7 +4,7 @@ import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol
 import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
 import { useState, useEffect } from "react";
 import ConnectWallet from "../components/ConnectButton";
-const Web3 = require("web3");
+import Web3 from "web3";
 
 export default function Home() {
   const web3 = new Web3(

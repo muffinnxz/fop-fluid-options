@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useRouter } from "next/router";
-import { useAccount, useProvider, useSigner } from "wagmi";
+import { useAccount } from "wagmi";
 import TradeableCallOption from "../../../contracts/artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json";
 import { Framework } from "@superfluid-finance/sdk-core";
 
 export default function User() {
     const router = useRouter();
     const { address, isConnected } = useAccount();
-    const { data: signer } = useSigner();
     const [optionAddress, setOptionAddress] = useState();
     const [optionData, setOptionData] = useState();
 
@@ -37,21 +36,39 @@ export default function User() {
         }
     };
 
-    const approveUnderlyingAsset = async () => {};
-
-    const createFlow = async () => {
-        console.log("Start create flow...");
-        const provider = new ethers.providers.JsonRpcProvider(
-            "https://eth-goerli.g.alchemy.com/v2/wZc5RVdqBMtlqlLySTdU4RcAxY2FcUAI"
-        );
-        const sf = await Framework.create({
-            chainId: 5,
-            provider: provider,
-        });
+    const approveUnderlyingAsset = async () => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
         const contract = new ethers.Contract(
             router.query.optionAddress,
             TradeableCallOption.abi,
-            ethers.getDefaultProvider("goerli")
+            signer
+        );
+
+        try {
+            let tx = await contract._activateOption();
+            await tx.wait();
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    };
+
+    const createFlow = async () => {
+        console.log("Start create flow...");
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const chainId = await window.ethereum.request({
+            method: "eth_chainId",
+        });
+        const sf = await Framework.create({
+            chainId: Number(chainId),
+            provider: provider,
+        });
+
+        const contract = new ethers.Contract(
+            router.query.optionAddress,
+            TradeableCallOption.abi,
+            provider
         );
 
         const DAIxContract = await sf.loadSuperToken("fDAIx");
@@ -59,27 +76,27 @@ export default function User() {
 
         try {
             const flowRate = await contract._requiredFlowRate();
-            console.log(
-                "FlowRate:",
-                flowRate,
-                ethers.BigNumber.from(flowRate).toString()
-            );
             const createFlowOperation = sf.cfaV1.createFlow({
-                flowRate: ethers.BigNumber.from(flowRate).toString(),
                 receiver: router.query.optionAddress,
+                flowRate: ethers.BigNumber.from(flowRate).toString(),
                 superToken: DAIx,
             });
 
             console.log("Creating your stream...");
 
-            const signer = sf.createSigner({
-                privateKey:
-                    "0xd2ebfb1517ee73c4bd3d209530a7e1c25352542843077109ae77a2c0213375f1",
-                provider: provider,
-            });
-
             const result = await createFlowOperation.exec(signer);
             console.log(result);
+
+            console.log(
+                `Congrats - you've just created a money stream!
+                    View Your Stream At: https://app.superfluid.finance/dashboard/${router.query.optionAddress}
+                    Network: Kovan
+                    Super Token: DAIx
+                    Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
+                    Receiver: ${router.query.optionAddress},
+                    FlowRate: ${flowRate}
+                `
+            );
         } catch (error) {
             console.log(
                 "Hmmm, your transaction threw an error. Make sure that this stream does not already exist, and that you've entered a valid Ethereum address!"
