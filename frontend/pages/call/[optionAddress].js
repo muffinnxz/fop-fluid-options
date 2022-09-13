@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import TradeableCallOption from "../../../contracts/artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json";
 import { Framework } from "@superfluid-finance/sdk-core";
 import LinkToken from "../../abis/LinkToken.json";
+import fDAIToken from "../../abis/fDAIToken.json";
 
 export default function User() {
     const router = useRouter();
@@ -138,9 +139,20 @@ export default function User() {
             TradeableCallOption.abi,
             signer
         );
+        const fDAI = new ethers.Contract(
+            "0x88271d333C72e51516B67f5567c728E702b3eeE8",
+            fDAIToken.result,
+            signer
+        );
         try {
-            const tx = await contract.exerciseOption();
+            const strikePrice = await contract._strikePrice();
+            let tx = await fDAI.approve(
+                router.query.optionAddress,
+                strikePrice
+            );
             await tx.wait();
+            let tx2 = await contract.exerciseOption();
+            await tx2.wait();
         } catch (err) {
             console.log("Error: ", err);
         }
