@@ -5,7 +5,14 @@ import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFacto
 import { useState, useEffect } from "react";
 import ConnectWallet from "../components/ConnectButton";
 import Web3 from "web3";
+import DropDownList from "../components/DropDown";
 
+
+
+const optionType = [
+  { value: "call", label: "call"},
+  { value: "put", label: "put"}
+]
 export default function Home() {
   const web3 = new Web3(
     new Web3.providers.HttpProvider(process.env.GOERLI_ALCHEMY_URL)
@@ -67,6 +74,7 @@ export default function Home() {
 
   async function mintOption(e) {
     e.preventDefault();
+    console.log(e.target[0].value);
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -132,6 +140,11 @@ export default function Home() {
     return Date.parse(val);
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(e.target[0].value)
+  }
+
   return (
     <div className={styles.container}>
       <h1>All Option</h1>
@@ -140,7 +153,7 @@ export default function Home() {
       <section>
         Mint Option
         <form onSubmit={mintOption}>
-          <input placeholder="call/put" required></input>
+          <DropDownList placeholder="call/put" options={optionType}/>
           <input placeholder="name" required></input>
           <input placeholder="underlyamount" required></input>
           <input placeholder="underlyasset" required></input>
@@ -164,7 +177,6 @@ export default function Home() {
           </div>
         );
       })}
-
       <section>Put</section>
     </div>
   );
