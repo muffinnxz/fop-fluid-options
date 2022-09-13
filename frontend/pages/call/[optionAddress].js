@@ -130,6 +130,22 @@ export default function User() {
         );
     };
 
+    const exerciseOption = async () => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+            router.query.optionAddress,
+            TradeableCallOption.abi,
+            signer
+        );
+        try {
+            const tx = await contract.exerciseOption();
+            await tx.wait();
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    };
+
     return (
         <div className=" h-screen">
             <h1>optionAddress:{optionAddress}</h1>
@@ -145,14 +161,24 @@ export default function User() {
                             approve underlying asset
                         </button>
                     ) : (
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                createFlow();
-                            }}
-                        >
-                            create flow
-                        </button>
+                        <div>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    createFlow();
+                                }}
+                            >
+                                create flow
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    exerciseOption();
+                                }}
+                            >
+                                exercise option
+                            </button>
+                        </div>
                     )
                 ) : (
                     <div>please connect your wallet</div>
