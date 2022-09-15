@@ -17,5 +17,9 @@
     "bugs": {
         "url": "https://github.com/mrmuffinnxz/fop-fluid-options/issues"
     },
-    "homepage": "https://github.com/mrmuffinnxz/fop-fluid-options#readme"
+    "homepage": "https://github.com/mrmuffinnxz/fop-fluid-options#readme",
+    "engines": {
+        "node": "14.18.0",
+        "npm": "8.5.5"
+    }
 }
