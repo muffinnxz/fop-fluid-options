@@ -4,8 +4,15 @@ import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
 import TradeableCallOption from "../../../contracts/artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json";
 import { Framework } from "@superfluid-finance/sdk-core";
-import LinkToken from "../../abis/LinkToken.json";
-import fDAIToken from "../../abis/fDAIToken.json";
+import LinkToken from "../../datas/abis/LinkToken.json";
+import fDAIToken from "../../datas/abis/fDAIToken.json";
+import { QRCodeSVG } from "qrcode.react";
+import styles from "../../styles/OptionDetail.module.css";
+import { Blocks } from "react-loader-spinner";
+import {
+    goerliTokenDecimal,
+    goerliTokenName,
+} from "../../datas/AddressDictionary";
 
 export default function User() {
     const router = useRouter();
@@ -14,14 +21,15 @@ export default function User() {
     const [optionData, setOptionData] = useState();
 
     useEffect(() => {
-        setOptionAddress(router.query.optionAddress);
         if (router.isReady) {
-            console.log("ready");
             getContractData(router.query.optionAddress);
-        } else {
-            console.log("loading");
         }
     }, [router.isReady]);
+
+    const timestampToDateTime = (timestamp) => {
+        const date = new Date(parseInt(timestamp));
+        return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+    };
 
     const getContractData = async (address) => {
         const provider = ethers.getDefaultProvider("goerli");
@@ -32,7 +40,28 @@ export default function User() {
         );
         try {
             const reciever = await contract._receiver();
-            setOptionData({ reciever: reciever });
+            const underlyingAsset = await contract._underlyingAsset();
+            const underlyingAmount = await contract._underlyingAmount();
+            const purchasingAsset = await contract._dai();
+            const purchasingAmount = await contract._strikePrice();
+            const priceFeed = await contract._priceFeed();
+            const requiredFlowRate = await contract._requiredFlowRate();
+            const expirationDate = await contract._expirationDate();
+            const optionReady = await contract.optionReady();
+            const optionActive = await contract.optionActive();
+            setOptionData({
+                address: address,
+                reciever: reciever,
+                underlyingAsset: underlyingAsset,
+                underlyingAmount: underlyingAmount,
+                purchasingAsset: purchasingAsset,
+                purchasingAmount: purchasingAmount,
+                priceFeed: priceFeed,
+                requiredFlowRate: requiredFlowRate,
+                expirationDate: expirationDate,
+                optionReady: optionReady,
+                optionActive: optionActive,
+            });
         } catch (err) {
             console.log("Error: ", err);
         }
@@ -158,10 +187,98 @@ export default function User() {
         }
     };
 
+    if (!optionData) {
+        return (
+            <div className={styles.option_detail_page}>
+                <div className={styles.option_detail_header}>
+                    <Blocks
+                        visible={true}
+                        height="80"
+                        width="80"
+                        ariaLabel="blocks-loading"
+                        wrapperStyle={{}}
+                        wrapperClass="blocks-wrapper"
+                    />
+                    <div
+                        style={{
+                            fontSize: "24px",
+                        }}
+                    >
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className=" h-screen">
-            <h1>optionAddress:{optionAddress}</h1>
-            {optionData ? (
+        <div className={styles.option_detail_page}>
+            <div className={styles.option_detail_header}>
+                <div
+                    style={{
+                        fontSize: "24px",
+                        fontWeight: "bold"
+                    }}
+                >
+                    Call Option
+                </div>
+                <div
+                    style={{
+                        marginTop: "10px",
+                        marginBottom: "10px",
+                    }}
+                >
+                    <QRCodeSVG
+                        value={"http://localhost:3000" + router.asPath}
+                    />
+                </div>
+                <div>address : {optionData.address}</div>
+            </div>
+            <div
+                className={styles.option_detail_card_list}
+                style={{ marginTop: "25px" }}
+            >
+                <div className={styles.option_detail_card}>
+                    <div className={styles.option_detail_card_title}>
+                        Pair
+                    </div>
+                    <div>
+                        {goerliTokenName[optionData.underlyingAsset]} /{" "}
+                        {goerliTokenName[optionData.purchasingAsset]}
+                    </div>
+                </div>
+                <div className={styles.option_detail_card}>
+                    <div className={styles.option_detail_card_title}>
+                        Underlying {goerliTokenName[optionData.underlyingAsset]}{" "}
+                    </div>
+                    <div>
+                        {(
+                            optionData.underlyingAmount /
+                            goerliTokenDecimal[optionData.underlyingAsset]
+                        ).toString()}
+                    </div>
+                </div>
+                <div className={styles.option_detail_card}>
+                    <div className={styles.option_detail_card_title}>
+                        Strike {goerliTokenName[optionData.purchasingAsset]}{" "}
+                    </div>
+                    <div>
+                        {(
+                            optionData.purchasingAmount /
+                            goerliTokenDecimal[optionData.purchasingAsset]
+                        ).toString()}
+                    </div>
+                </div>
+                <div className={styles.option_detail_card}>
+                    <div className={styles.option_detail_card_title}>
+                        Expiration
+                    </div>
+                    <div>
+                        {timestampToDateTime(optionData.expirationDate)}
+                    </div>
+                </div>
+            </div>
+            {/* {optionData ? (
                 isConnected ? (
                     optionData.reciever === address ? (
                         <button
@@ -197,7 +314,7 @@ export default function User() {
                 )
             ) : (
                 <div>loading...</div>
-            )}
+            )} */}
         </div>
     );
 }

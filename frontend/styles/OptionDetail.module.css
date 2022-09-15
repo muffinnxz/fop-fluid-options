@@ -1,0 +1,44 @@
+.option_detail_page {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.option_detail_header {
+    width: 80%;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 12px solid aquamarine;
+    border-radius: 10px;
+}
+
+.option_detail_card_list {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    justify-content: space-around;
+}
+
+.option_detail_card {
+    width: 200px;
+    height: 80px;
+    padding: 10px;
+    background-color: white;
+    box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    border-left: 7px solid aquamarine;
+    border-radius: 7px;
+}
+
+.option_detail_card_title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
