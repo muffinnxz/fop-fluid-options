@@ -4,9 +4,10 @@
     "description": "Streaming Options Marketplace submitted for ETHOnline2022",
     "main": "index.js",
     "scripts": {
-        "dev": "cd frontend && next dev",
-        "build": "cd frontend && npm install && next build",
-        "start": "cd frontend && next start -p $PORT"
+        "dev": "cd frontend && npm run dev",
+        "build": "cd frontend/ && npm run build",
+        "start": "cd frontend/ && npm start -p $PORT",
+        "heroku-prebuild": "NODE_ENV=production cd frontend/ && && npm install && npm install --dev"
     },
     "repository": {
         "type": "git",
