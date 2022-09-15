@@ -122,17 +122,17 @@ contract RedirectAllPutOption is SuperAppBase {
     //DAI is hardcoded in this example, so don't have to worry about that for now
     //we need to align the decimal value of price feed return and underlying asset
     function createOption(
-        uint256 underlyingAmount,
         ERC20 purchasingAsset,
-        int256 strikePrice,
+        uint256 underlyingAmount,
         uint8 purchasingDecimals,
         AggregatorV3Interface priceFeed,
         uint8 priceFeedDecimals,
         int96 requiredFlowRate,
-        uint256 expirationDate
+        uint256 expirationDate,
+        int256 strikePrice
     ) external {
         //only the receiver (the seller of the option and owner of the NFT) can activate the option
-        require(_receiver == msg.sender);
+        require(_receiver == tx.origin);
         _underlyingAmount = underlyingAmount;
         _purchasingAsset = ERC20(purchasingAsset);
         _purchasingDecimals = purchasingDecimals;
@@ -183,7 +183,7 @@ contract RedirectAllPutOption is SuperAppBase {
         } else {
             //exercise the option
             //get current price of the purchasing asset using chainlink
-            (, int256 currentPrice, , , ) = _priceFeed.latestRoundData(); 
+            (, int256 currentPrice, , , ) = _priceFeed.latestRoundData();
             // ERC20/USD decimal 8
             // USD/ETH decimal 18
 
@@ -212,17 +212,27 @@ contract RedirectAllPutOption is SuperAppBase {
                 address(this)
             );
 
-            int256 currentRatioPrice = int256((currentPrice * _strikePrice) / int256(10 ** uint256(_purchasingDecimals)));
+            int256 currentRatioPrice = int256(
+                (currentPrice * _strikePrice) /
+                    int256(10**uint256(_purchasingDecimals))
+            );
 
             //require that flowRate is sufficient & option is in the money for option to be exercises
-            require(uint256(currentRatioPrice) <= _underlyingAmount, "option out of the money");
+            require(
+                uint256(currentRatioPrice) <= _underlyingAmount,
+                "option out of the money"
+            );
             require(
                 currentFlowRate >= _requiredFlowRate,
                 "insufficient flow rate"
             );
 
             //NOTE - caller of this function MUST approve DAI first before calling this function
-            _purchasingAsset.transferFrom(msg.sender, _receiver, uint256(_strikePrice));
+            _purchasingAsset.transferFrom(
+                msg.sender,
+                _receiver,
+                uint256(_strikePrice)
+            );
             _dai.transfer(msg.sender, _underlyingAmount);
 
             cfaV1.deleteFlow(address(this), _receiver, _acceptedToken);
@@ -239,7 +249,8 @@ contract RedirectAllPutOption is SuperAppBase {
      *************************************************************************/
 
     function currentReceiver()
-        external view
+        external
+        view
         returns (
             uint256 startTime,
             address receiver,
@@ -247,10 +258,14 @@ contract RedirectAllPutOption is SuperAppBase {
         )
     {
         if (_receiver != address(0)) {
-            (startTime, flowRate,,) = _cfa.getFlow(_acceptedToken, address(this), _receiver);
+            (startTime, flowRate, , ) = _cfa.getFlow(
+                _acceptedToken,
+                address(this),
+                _receiver
+            );
             receiver = _receiver;
         }
-    } 
+    }
 
     event ReceiverChanged(address receiver); //what is this?
 
@@ -259,36 +274,63 @@ contract RedirectAllPutOption is SuperAppBase {
         private
         returns (bytes memory newCtx)
     {
-      newCtx = ctx;
-      // @dev This will give me the new flowRate, as it is called in after callbacks
-      int96 netFlowRate = _cfa.getNetFlow(_acceptedToken, address(this));
-      (,int96 outFlowRate,,) = _cfa.getFlow(_acceptedToken, address(this), _receiver); // CHECK: unclear what happens if flow doesn't exist.
-      int96 inFlowRate = netFlowRate + outFlowRate;
+        newCtx = ctx;
+        // @dev This will give me the new flowRate, as it is called in after callbacks
+        int96 netFlowRate = _cfa.getNetFlow(_acceptedToken, address(this));
+        (, int96 outFlowRate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            address(this),
+            _receiver
+        ); // CHECK: unclear what happens if flow doesn't exist.
+        int96 inFlowRate = netFlowRate + outFlowRate;
 
-      // @dev If inFlowRate === 0, then delete existing flow.
-      if (inFlowRate == int96(0)) {
-        // @dev if inFlowRate is zero, delete outflow.
-        newCtx = cfaV1.deleteFlowWithCtx(newCtx, address(this), _receiver, _acceptedToken);
-        } else if (outFlowRate != int96(0)){
-        newCtx = cfaV1.updateFlowWithCtx(ctx, _receiver, _acceptedToken, inFlowRate);
-      } else {
-      // @dev If there is no existing outflow, then create new flow to equal inflow
-        newCtx = cfaV1.createFlowWithCtx(ctx, _receiver, _acceptedToken, inFlowRate);
-      }
+        // @dev If inFlowRate === 0, then delete existing flow.
+        if (inFlowRate == int96(0)) {
+            // @dev if inFlowRate is zero, delete outflow.
+            newCtx = cfaV1.deleteFlowWithCtx(
+                newCtx,
+                address(this),
+                _receiver,
+                _acceptedToken
+            );
+        } else if (outFlowRate != int96(0)) {
+            newCtx = cfaV1.updateFlowWithCtx(
+                ctx,
+                _receiver,
+                _acceptedToken,
+                inFlowRate
+            );
+        } else {
+            // @dev If there is no existing outflow, then create new flow to equal inflow
+            newCtx = cfaV1.createFlowWithCtx(
+                ctx,
+                _receiver,
+                _acceptedToken,
+                inFlowRate
+            );
+        }
     }
 
     // @dev Change the Receiver of the total flow
-    function _changeReceiver( address newReceiver ) internal {
+    function _changeReceiver(address newReceiver) internal {
         require(newReceiver != address(0));
         // @dev because our app is registered as final, we can't take downstream apps
         require(!_host.isApp(ISuperApp(newReceiver)));
-        if (newReceiver == _receiver) return ;
+        if (newReceiver == _receiver) return;
         // @dev delete flow to old receiver
-        (,int96 outFlowRate,,) = _cfa.getFlow(_acceptedToken, address(this), _receiver); //CHECK: unclear what happens if flow doesn't exist.
-        if(outFlowRate > 0){
+        (, int96 outFlowRate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            address(this),
+            _receiver
+        ); //CHECK: unclear what happens if flow doesn't exist.
+        if (outFlowRate > 0) {
             cfaV1.deleteFlow(address(this), _receiver, _acceptedToken);
-          // @dev create flow to new receiver
-            cfaV1.createFlow(_receiver, _acceptedToken, _cfa.getNetFlow(_acceptedToken, address(this)));
+            // @dev create flow to new receiver
+            cfaV1.createFlow(
+                _receiver,
+                _acceptedToken,
+                _cfa.getNetFlow(_acceptedToken, address(this))
+            );
         }
         // @dev set global receiver to new receiver
         _receiver = newReceiver;
@@ -300,17 +342,16 @@ contract RedirectAllPutOption is SuperAppBase {
      * SuperApp callbacks
      *************************************************************************/
 
-   
-
     function afterAgreementCreated(
         ISuperToken _superToken,
         address _agreementClass,
         bytes32, // _agreementId,
-        bytes calldata /*_agreementData*/,
-        bytes calldata ,// _cbdata,
+        bytes calldata, /*_agreementData*/
+        bytes calldata, // _cbdata,
         bytes calldata _ctx
     )
-        external override
+        external
+        override
         onlyExpected(_superToken, _agreementClass)
         onlyHost
         returns (bytes memory newCtx)
@@ -318,7 +359,11 @@ contract RedirectAllPutOption is SuperAppBase {
         ISuperfluid.Context memory decompiledContext = _host.decodeCtx(_ctx);
         address senderAddress = decompiledContext.msgSender;
 
-        (, int96 initialFlowRate,,) = _cfa.getFlow(_acceptedToken, senderAddress, address(this));
+        (, int96 initialFlowRate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            senderAddress,
+            address(this)
+        );
 
         if (initialFlowRate >= _requiredFlowRate && optionReady == true) {
             _activateOption();
@@ -331,34 +376,42 @@ contract RedirectAllPutOption is SuperAppBase {
     function afterAgreementUpdated(
         ISuperToken _superToken,
         address _agreementClass,
-        bytes32 ,//_agreementId,
+        bytes32, //_agreementId,
         bytes calldata, // agreementData,
-        bytes calldata ,//_cbdata,
+        bytes calldata, //_cbdata,
         bytes calldata _ctx
     )
-        external override
+        external
+        override
         onlyExpected(_superToken, _agreementClass)
         onlyHost
         returns (bytes memory newCtx)
     {
-        
         //check if option is currently active
-        //if it's not currently active and updatedFlowRate >= _requiredFlowRate, then activate the option 
+        //if it's not currently active and updatedFlowRate >= _requiredFlowRate, then activate the option
         //get flowRate from buyer
-        (, int96 updatedFlowRate,,) = _cfa.getFlow(_acceptedToken, msg.sender, address(this));
-        //if the new flowRate meets requirements 
-        //and if we are not yet at expiration date 
-        //and option is ready, but not yet active 
-        //activate the option 
-        if (updatedFlowRate >= _requiredFlowRate && block.timestamp < _expirationDate && optionReady == true && optionActive == false) {
+        (, int96 updatedFlowRate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            msg.sender,
+            address(this)
+        );
+        //if the new flowRate meets requirements
+        //and if we are not yet at expiration date
+        //and option is ready, but not yet active
+        //activate the option
+        if (
+            updatedFlowRate >= _requiredFlowRate &&
+            block.timestamp < _expirationDate &&
+            optionReady == true &&
+            optionActive == false
+        ) {
             _activateOption();
         }
-        
-        //if option is active and flowRate from buyer is lower than the required flowRate, deactivate the option 
+        //if option is active and flowRate from buyer is lower than the required flowRate, deactivate the option
         else if (optionActive == true && updatedFlowRate < _requiredFlowRate) {
             _deactivateOption();
         }
-        
+
         return _updateOutflow(_ctx);
     }
 
@@ -366,34 +419,33 @@ contract RedirectAllPutOption is SuperAppBase {
     function afterAgreementTerminated(
         ISuperToken _superToken,
         address _agreementClass,
-        bytes32 ,//_agreementId,
-        bytes calldata /*_agreementData*/,
-        bytes calldata ,//_cbdata,
+        bytes32, //_agreementId,
+        bytes calldata, /*_agreementData*/
+        bytes calldata, //_cbdata,
         bytes calldata _ctx
-    )
-        external override
-        onlyHost
-        returns (bytes memory newCtx)
-    {
+    ) external override onlyHost returns (bytes memory newCtx) {
         // According to the app basic law, we should never revert in a termination callback
-        if (!_isSameToken(_superToken) || !_isCFAv1(_agreementClass)) return _ctx;
-        
-        //deactivate the option if the flow is deleted - but don't use the function
-        //change expiration date to now so that option can no longer be exercised 
+        if (!_isSameToken(_superToken) || !_isCFAv1(_agreementClass))
+            return _ctx;
 
-         _expirationDate = block.timestamp;
-        
+        //deactivate the option if the flow is deleted - but don't use the function
+        //change expiration date to now so that option can no longer be exercised
+
+        _expirationDate = block.timestamp;
+
         //set option to inactive & not ready
         optionActive = false;
-        optionReady = false; 
-        //use try catch - don't run transfer by itself in termination callback 
+        optionReady = false;
+        //use try catch - don't run transfer by itself in termination callback
         //approve in the catch{}
-        try _dai.transfer(_receiver, _underlyingAmount)
+        try
+            _dai.transfer(_receiver, _underlyingAmount)
         // solhint-disable-next-line no-empty-blocks
 
-        {} catch {
-                _dai.approve(_receiver, _underlyingAmount);
-        
+        {
+
+        } catch {
+            _dai.approve(_receiver, _underlyingAmount);
         }
 
         return _updateOutflow(_ctx);
@@ -404,12 +456,18 @@ contract RedirectAllPutOption is SuperAppBase {
     }
 
     function _isCFAv1(address agreementClass) private view returns (bool) {
-        return ISuperAgreement(agreementClass).agreementType()
-            == keccak256("org.superfluid-finance.agreements.ConstantFlowAgreement.v1");
+        return
+            ISuperAgreement(agreementClass).agreementType() ==
+            keccak256(
+                "org.superfluid-finance.agreements.ConstantFlowAgreement.v1"
+            );
     }
 
     modifier onlyHost() {
-        require(msg.sender == address(_host), "RedirectAll: support only one host");
+        require(
+            msg.sender == address(_host),
+            "RedirectAll: support only one host"
+        );
         _;
     }
 

@@ -4,8 +4,12 @@ pragma solidity 0.8.13;
 import {ISuperToken, IConstantFlowAgreementV1, ISuperfluid} from "./RedirectAllPutOption.sol";
 import {TradeablePutOption} from "./TradeablePutOption.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract OptionPutFactory {
+    ISuperfluid host = ISuperfluid(0x22ff293e14F1EC3A09B137e9e06084AFd63adDF9);
+    IConstantFlowAgreementV1 cfa =
+        IConstantFlowAgreementV1(0xEd6BcbF6907D4feEEe8a8875543249bEa9D308E8);
     mapping(address => address[]) public walletToPutOptions;
 
     address[] putOptions;
@@ -25,21 +29,38 @@ contract OptionPutFactory {
     function mintPutOption(
         address owner,
         string memory _name,
-        string memory _symbol,
-        ISuperfluid host,
-        IConstantFlowAgreementV1 cfa,
         ISuperToken acceptedToken,
-        ERC20 dai
+        ERC20 dai,
+        ERC20 purchasingAsset,
+        uint256 underlyingAmount,
+        uint8 purchasingDecimals,
+        AggregatorV3Interface priceFeed,
+        uint8 priceFeedDecimals,
+        int96 requiredFlowRate,
+        uint256 expirationDate,
+        int256 strikePrice
     ) public {
         TradeablePutOption _option = new TradeablePutOption(
             owner,
             _name,
-            _symbol,
+            "FOP",
             host,
             cfa,
             acceptedToken,
             dai
         );
+
+        _option.createOption(
+            purchasingAsset,
+            underlyingAmount,
+            purchasingDecimals,
+            priceFeed,
+            priceFeedDecimals,
+            requiredFlowRate,
+            expirationDate,
+            strikePrice
+        );
+
         walletToPutOptions[owner].push(address(_option));
         putOptions.push(address(_option));
     }

@@ -43,7 +43,7 @@ module.exports = {
     goerli: {
       url: `${process.env.GOERLI_ALCHEMY_URL}`,
       accounts: [`0x${process.env.GOERLI_DEPLOYER_PRIVATE_KEY}`],
-      // allowUnlimitedContractSize: true,
+      allowUnlimitedContractSize: true,
     },
     hardhat: {
       allowUnlimitedContractSize: true,
