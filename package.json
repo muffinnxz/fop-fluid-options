@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "cd frontend && npm run dev",
         "build": "cd frontend/ && npm run build",
-        "start": "cd frontend/ && npm start -p $PORT",
+        "start": "cd frontend/ && npm start",
         "heroku-prebuild": "NODE_ENV=production cd frontend/ && npm install && npm install --dev"
     },
     "repository": {
