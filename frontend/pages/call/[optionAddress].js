@@ -13,12 +13,14 @@ import {
     goerliTokenDecimal,
     goerliTokenName,
 } from "../../datas/AddressDictionary";
+import ConnectWallet from "../../components/ConnectButton";
+import { Button } from "@mui/material";
 
 export default function User() {
     const router = useRouter();
     const { address, isConnected } = useAccount();
-    const [optionAddress, setOptionAddress] = useState();
     const [optionData, setOptionData] = useState();
+    const [underlyingAllowance, setUnderlyingAllowance] = useState();
 
     useEffect(() => {
         if (router.isReady) {
@@ -26,9 +28,34 @@ export default function User() {
         }
     }, [router.isReady]);
 
+    useEffect(() => {
+        if (optionData && address && optionData.reciever === address) {
+            checkUserUnderlyingAllowance();
+        }
+    }, [optionData, address]);
+
     const timestampToDateTime = (timestamp) => {
         const date = new Date(parseInt(timestamp));
-        return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        return date.toLocaleDateString();
+        // return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+    };
+
+    const checkUserUnderlyingAllowance = async () => {
+        const provider = ethers.getDefaultProvider("goerli");
+        const link = new ethers.Contract(
+            optionData.underlyingAsset,
+            LinkToken.result,
+            provider
+        );
+        try {
+            let underlyingAllowance = await link.allowance(
+                address,
+                router.query.optionAddress
+            );
+            setUnderlyingAllowance(underlyingAllowance);
+        } catch (err) {
+            console.log("Error: ", err);
+        }
     };
 
     const getContractData = async (address) => {
@@ -45,6 +72,7 @@ export default function User() {
             const purchasingAsset = await contract._dai();
             const purchasingAmount = await contract._strikePrice();
             const priceFeed = await contract._priceFeed();
+            const flowAsset = await contract._acceptedToken();
             const requiredFlowRate = await contract._requiredFlowRate();
             const expirationDate = await contract._expirationDate();
             const optionReady = await contract.optionReady();
@@ -57,6 +85,7 @@ export default function User() {
                 purchasingAsset: purchasingAsset,
                 purchasingAmount: purchasingAmount,
                 priceFeed: priceFeed,
+                flowAsset: flowAsset,
                 requiredFlowRate: requiredFlowRate,
                 expirationDate: expirationDate,
                 optionReady: optionReady,
@@ -76,7 +105,7 @@ export default function User() {
             signer
         );
         const link = new ethers.Contract(
-            "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+            optionData.underlyingAsset,
             LinkToken.result,
             signer
         );
@@ -152,7 +181,7 @@ export default function User() {
         const flowRate = await contract._requiredFlowRate();
         console.log(
             router.query.optionAddress,
-            ethers.BigNumber.from(flowRate).toString()
+            ethers.BigNumber.from(optionData.requiredFlowRate).toString()
         );
         await createNewFlow(
             router.query.optionAddress,
@@ -217,7 +246,7 @@ export default function User() {
                 <div
                     style={{
                         fontSize: "24px",
-                        fontWeight: "bold"
+                        fontWeight: "bold",
                     }}
                 >
                     Call Option
@@ -239,10 +268,8 @@ export default function User() {
                 style={{ marginTop: "25px" }}
             >
                 <div className={styles.option_detail_card}>
-                    <div className={styles.option_detail_card_title}>
-                        Pair
-                    </div>
-                    <div>
+                    <div className={styles.option_detail_card_title}>Pair</div>
+                    <div className={styles.option_detail_card_value}>
                         {goerliTokenName[optionData.underlyingAsset]} /{" "}
                         {goerliTokenName[optionData.purchasingAsset]}
                     </div>
@@ -251,7 +278,7 @@ export default function User() {
                     <div className={styles.option_detail_card_title}>
                         Underlying {goerliTokenName[optionData.underlyingAsset]}{" "}
                     </div>
-                    <div>
+                    <div className={styles.option_detail_card_value}>
                         {(
                             optionData.underlyingAmount /
                             goerliTokenDecimal[optionData.underlyingAsset]
@@ -262,7 +289,7 @@ export default function User() {
                     <div className={styles.option_detail_card_title}>
                         Strike {goerliTokenName[optionData.purchasingAsset]}{" "}
                     </div>
-                    <div>
+                    <div className={styles.option_detail_card_value}>
                         {(
                             optionData.purchasingAmount /
                             goerliTokenDecimal[optionData.purchasingAsset]
@@ -271,50 +298,93 @@ export default function User() {
                 </div>
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>
+                        Flow {goerliTokenName[optionData.flowAsset]} / sec.
+                    </div>
+                    <div className={styles.option_detail_card_value}>
+                        {(
+                            optionData.requiredFlowRate /
+                            goerliTokenDecimal[optionData.flowAsset]
+                        )
+                            .toFixed(12)
+                            .toString()}
+                    </div>
+                </div>
+                <div className={styles.option_detail_card}>
+                    <div className={styles.option_detail_card_title}>
                         Expiration
                     </div>
-                    <div>
+                    <div className={styles.option_detail_card_value}>
                         {timestampToDateTime(optionData.expirationDate)}
                     </div>
                 </div>
             </div>
-            {/* {optionData ? (
-                isConnected ? (
-                    optionData.reciever === address ? (
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                approveUnderlyingAsset();
-                            }}
-                        >
-                            approve underlying asset
-                        </button>
-                    ) : (
-                        <div>
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    createFlow();
-                                }}
-                            >
-                                create flow
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    exerciseOption();
-                                }}
-                            >
-                                exercise option
-                            </button>
-                        </div>
-                    )
-                ) : (
-                    <div>please connect your wallet</div>
-                )
-            ) : (
-                <div>loading...</div>
-            )} */}
+            <div
+                className={styles.option_detail_header}
+                style={{ marginTop: "20px" }}
+            >
+                <ConnectWallet />
+                {isConnected && (
+                    <div style={{ marginTop: "20px" }}>
+                        {optionData.reciever === address ? (
+                            <div>
+                                {underlyingAllowance ? (
+                                    underlyingAllowance >=
+                                    optionData.underlyingAmount ? (
+                                        <div>
+                                            You already approve sufficient
+                                            amount of the underlying asset (
+                                            {
+                                                goerliTokenName[
+                                                    optionData.underlyingAsset
+                                                ]
+                                            }
+                                            )
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            variant="contained"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                approveUnderlyingAsset();
+                                            }}
+                                        >
+                                            Approving Underlying Asset
+                                        </Button>
+                                    )
+                                ) : (
+                                    <Blocks
+                                        visible={true}
+                                        height="40"
+                                        width="40"
+                                        ariaLabel="blocks-loading"
+                                        wrapperStyle={{}}
+                                        wrapperClass="blocks-wrapper"
+                                    />
+                                )}
+                            </div>
+                        ) : (
+                            <div>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        createFlow();
+                                    }}
+                                >
+                                    create flow
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        exerciseOption();
+                                    }}
+                                >
+                                    exercise option
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
