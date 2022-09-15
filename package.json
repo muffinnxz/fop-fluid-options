@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "cd frontend && next dev",
-        "build": "cd frontend && npm install && next build",
+        "build": "cd frontend && next build",
         "start": "cd frontend && next start -p $PORT"
     },
     "repository": {
