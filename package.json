@@ -7,7 +7,7 @@
         "dev": "cd frontend && npm run dev",
         "build": "cd frontend/ && npm run build",
         "start": "cd frontend/ && npm start -p $PORT",
-        "heroku-prebuild": "NODE_ENV=production cd frontend/ && && npm install && npm install --dev"
+        "heroku-prebuild": "NODE_ENV=production cd frontend/ && npm install && npm install --dev"
     },
     "repository": {
         "type": "git",
