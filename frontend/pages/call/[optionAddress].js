@@ -323,66 +323,67 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 <ConnectWallet />
-                {isConnected && (
+                {isConnected && (optionData.optionReady ?
                     <div style={{ marginTop: "20px" }}>
                         {optionData.reciever === address ? (
-                            <div>
-                                {underlyingAllowance ? (
-                                    underlyingAllowance >=
-                                    optionData.underlyingAmount ? (
-                                        <div>
-                                            You already approve sufficient
-                                            amount of the underlying asset (
-                                            {
-                                                goerliTokenName[
-                                                    optionData.underlyingAsset
-                                                ]
-                                            }
-                                            )
-                                        </div>
-                                    ) : (
-                                        <Button
-                                            variant="contained"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                approveUnderlyingAsset();
-                                            }}
-                                        >
-                                            Approving Underlying Asset
-                                        </Button>
-                                    )
+                            underlyingAllowance ? (
+                                underlyingAllowance >=
+                                optionData.underlyingAmount ? (
+                                    <div>
+                                        You already approve sufficient amount of
+                                        the underlying asset (
+                                        {
+                                            goerliTokenName[
+                                                optionData.underlyingAsset
+                                            ]
+                                        }
+                                        )
+                                    </div>
                                 ) : (
-                                    <Blocks
-                                        visible={true}
-                                        height="40"
-                                        width="40"
-                                        ariaLabel="blocks-loading"
-                                        wrapperStyle={{}}
-                                        wrapperClass="blocks-wrapper"
-                                    />
-                                )}
-                            </div>
+                                    <Button
+                                        variant="contained"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            approveUnderlyingAsset();
+                                        }}
+                                    >
+                                        Approving Underlying Asset
+                                    </Button>
+                                )
+                            ) : (
+                                <Blocks
+                                    visible={true}
+                                    height="40"
+                                    width="40"
+                                    ariaLabel="blocks-loading"
+                                    wrapperStyle={{}}
+                                    wrapperClass="blocks-wrapper"
+                                />
+                            )
                         ) : (
                             <div>
-                                <button
+                                <Button
+                                    variant="contained"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         createFlow();
                                     }}
                                 >
-                                    create flow
-                                </button>
-                                <button
+                                    Create Flow
+                                </Button>
+                                <Button
+                                    variant="contained"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         exerciseOption();
                                     }}
+                                    style={{marginLeft: "20px"}}
                                 >
-                                    exercise option
-                                </button>
+                                    Exercise Option
+                                </Button>
                             </div>
                         )}
-                    </div>
+                    </div> : <div style={{ marginTop: "20px" }}>Option is not ready, already closed, or expire!</div>
                 )}
             </div>
         </div>
