@@ -6,6 +6,40 @@ import { useState, useEffect } from "react";
 import ConnectWallet from "../components/ConnectButton";
 import Web3 from "web3";
 
+import { Input } from '@nextui-org/react';
+import { Button } from "@nextui-org/react";
+import { Card } from "@nextui-org/react";
+import { Text } from "@nextui-org/react";
+import { Container, Row, Col } from '@nextui-org/react';
+import App from "../components/DropDown";
+import DropDownList from "../components/DropDownList";
+import { Select } from "@mui/material";
+
+const OptionType = {
+  CALL:'call',
+  PUT:'put',
+}
+
+const underlyAssetOptions = [
+  { value: "0x88271d333C72e51516B67f5567c728E702b3eeE8", label: "dai"},
+  { value: "0xdAC17F958D2ee523a2206206994597C13D831ec7", label: "usdt"}
+]
+
+const priceFeedOptions = [
+  { value: "0x88271d333C72e51516B67f5567c728E702b3eeE8", label: "dai/usdt"},
+  { value: "0xdAC17F958D2ee523a2206206994597C13D831ec7", label: "usdt/dai"}
+]
+
+const underlyasset = {
+  dai: "0x88271d333C72e51516B67f5567c728E702b3eeE8"
+}
+
+const optionsf = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' }
+  ]
+
 export default function Home() {
   const web3 = new Web3(
     new Web3.providers.HttpProvider(process.env.GOERLI_ALCHEMY_URL)
@@ -18,6 +52,9 @@ export default function Home() {
 
   const [callOptions, setCallOptions] = useState([]);
   const [putOptions, setPutOptions] = useState([]);
+  
+  const [optionType, setOptionType] = useState(OptionType.CALL)
+  
 
   useEffect(() => {
     getAllCallOption();
@@ -72,13 +109,13 @@ export default function Home() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(
-        e.target[0].value == "call" ? CallFactoryAddress : PutFactoryAddress,
-        e.target[0].value == "call" ? OptionFactory.abi : OptionPutFactory.abi,
+        optionType == "call" ? CallFactoryAddress : PutFactoryAddress,
+        optionType == "call" ? OptionFactory.abi : OptionPutFactory.abi,
         signer
       );
       try {
         let addr = await signer.getAddress();
-        e.target[0].value == "call"
+        optionType == "call"
           ? await contract.mintCallOption(
               addr,
               e.target[1].value,
@@ -132,26 +169,57 @@ export default function Home() {
     return Date.parse(val);
   }
 
+  const OptionTypeGroup = () => {
+    return (
+      <Button.Group css={{ m: 0 }}>
+        <Button
+          onPress={() => setOptionType(OptionType.CALL)}
+          bordered={optionType != OptionType.CALL}
+        >
+          CALL
+        </Button>
+        <Button
+          onPress={() => setOptionType(OptionType.PUT)}
+          bordered={optionType != OptionType.PUT}
+        >
+          PUT
+        </Button>
+      </Button.Group>
+    )
+  }
+
+  const test = (e) => {
+    e.preventDefault();
+    console.log(e.target[0].value)
+    console.log(e.target)
+  }
+
   return (
     <div className={styles.container}>
       <h1>All Option</h1>
       <ConnectWallet />
 
-      <section>
-        Mint Option
-        <form onSubmit={mintOption}>
-          <input placeholder="call/put" required></input>
-          <input placeholder="name" required></input>
-          <input placeholder="underlyamount" required></input>
-          <input placeholder="underlyasset" required></input>
-          <input placeholder="strike price" required></input>
-          <input placeholder="purchase decimal" required></input>
-          <input placeholder="price feed" required></input>
-          <input placeholder="price feed decimal" required></input>
-          <input placeholder="flow rate per sec" required></input>
-          <input placeholder="expiration" type="date" required></input>
-          <button>submit</button>
-        </form>
+      <section className="flex flex-col justify-center items-center space-y-3">
+        <Text>Mint option</Text>
+        <Container>
+          <Card css={{padding: '$4 $4'}}>
+            <form onSubmit={mintOption} className='grid md:grid-cols-3 lg:grid-cols-4 space-x-2 space-y-3 items-center border-blue-200 border-solid border-2 p-2 rounded-xl'>
+              <div className="flex justify-start">
+                <OptionTypeGroup></OptionTypeGroup>
+              </div>
+              <Input clearable placeholder="Name" type="text" required></Input>
+              <Input clearable placeholder="underlyamount" type="number" required></Input>
+              <DropDownList options={underlyAssetOptions} placeholder="underlyasset"/>
+              <Input clearable placeholder="strike price" type="number" required></Input>
+              <Input clearable  placeholder="purchase decimal" type="number" required></Input>
+              <DropDownList options={priceFeedOptions} placeholder="price"/>
+              <Input clearable  placeholder="price feed decimal" type="number" required></Input>
+              <Input clearable  placeholder="flow rate per sec" type="number" required></Input>
+              <Input clearable placeholder="expiration" type="date" required></Input>
+              <Button >create option</Button>
+            </form>
+          </Card>
+        </Container>
       </section>
 
       <section>Call</section>
@@ -164,7 +232,6 @@ export default function Home() {
           </div>
         );
       })}
-
       <section>Put</section>
     </div>
   );

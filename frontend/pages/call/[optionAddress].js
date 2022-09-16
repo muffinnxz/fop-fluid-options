@@ -270,6 +270,7 @@ export default function User() {
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>Pair</div>
                     <div className={styles.option_detail_card_value}>
+                        {console.log(goerliTokenName)}
                         {goerliTokenName[optionData.underlyingAsset]} /{" "}
                         {goerliTokenName[optionData.purchasingAsset]}
                     </div>
