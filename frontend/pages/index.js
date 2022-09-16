@@ -21,8 +21,8 @@ const OptionType = {
 }
 
 const underlyAssetOptions = [
-  { value: "0x88271d333C72e51516B67f5567c728E702b3eeE8", label: "dai"},
-  { value: "0xdAC17F958D2ee523a2206206994597C13D831ec7", label: "usdt"}
+  { value: { address: "0x88271d333C72e51516B67f5567c728E702b3eeE8", decimal: 18} , label: "dai"},
+  { value: { address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", decimal: 18}, label: "usdt"}
 ]
 
 const priceFeedOptions = [
@@ -121,12 +121,12 @@ export default function Home() {
               e.target[1].value,
               fDAIx,
               dai,
-              e.target[3].value,
+              e.target[3].value.address,
               e.target[2].value,
+              e.target[3].value.decimal,
               e.target[5].value,
               e.target[6].value,
               e.target[7].value,
-              e.target[8].value,
               getTime(e.target[9].value),
               e.target[4].value
             )
@@ -135,12 +135,12 @@ export default function Home() {
               e.target[1].value,
               fDAIx,
               dai,
-              e.target[3].value,
+              e.target[3].value.address,
               e.target[2].value,
+              e.target[3].value.decimal,
               e.target[5].value,
               e.target[6].value,
               e.target[7].value,
-              e.target[8].value,
               getTime(e.target[9].value),
               e.target[4].value
             );
@@ -211,7 +211,6 @@ export default function Home() {
               <Input clearable placeholder="underlyamount" type="number" required></Input>
               <DropDownList options={underlyAssetOptions} placeholder="underlyasset"/>
               <Input clearable placeholder="strike price" type="number" required></Input>
-              <Input clearable  placeholder="purchase decimal" type="number" required></Input>
               <DropDownList options={priceFeedOptions} placeholder="price"/>
               <Input clearable  placeholder="price feed decimal" type="number" required></Input>
               <Input clearable  placeholder="flow rate per sec" type="number" required></Input>
