@@ -298,12 +298,12 @@ export default function User() {
                 </div>
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>
-                        Flow {goerliTokenName[optionData.flowAsset]} / sec.
+                        Flow {goerliTokenName[optionData.flowAsset]} / day
                     </div>
                     <div className={styles.option_detail_card_value}>
                         {(
                             optionData.requiredFlowRate /
-                            goerliTokenDecimal[optionData.flowAsset]
+                            goerliTokenDecimal[optionData.flowAsset] * 86400
                         )
                             .toFixed(12)
                             .toString()}
