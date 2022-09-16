@@ -21,6 +21,7 @@ export default function User() {
     const { address, isConnected } = useAccount();
     const [optionData, setOptionData] = useState();
     const [underlyingAllowance, setUnderlyingAllowance] = useState();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (router.isReady) {
@@ -189,6 +190,48 @@ export default function User() {
         );
     };
 
+    //where the Superfluid logic takes place
+    async function deleteFlow(recipient) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        const signer = provider.getSigner();
+
+        const chainId = await window.ethereum.request({
+            method: "eth_chainId",
+        });
+        const sf = await Framework.create({
+            chainId: Number(chainId),
+            provider: provider,
+        });
+
+        const DAIxContract = await sf.loadSuperToken("fDAIx");
+        const DAIx = DAIxContract.address;
+
+        try {
+            const deleteFlowOperation = sf.cfaV1.deleteFlow({
+                sender: address,
+                receiver: recipient,
+                superToken: DAIx,
+                // userData?: string
+            });
+
+            console.log("Deleting your stream...");
+
+            await deleteFlowOperation.exec(signer);
+
+            console.log(
+                `Congrats - you've just deleted your money stream!
+         Network: Kovan
+         Super Token: DAIx
+         Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
+         Receiver: ${recipient}
+      `
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const exerciseOption = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
@@ -315,9 +358,9 @@ export default function User() {
                         Expiration
                     </div>
                     <div className={styles.option_detail_card_value}>
-                        {!optionData.optionReady &&
-                            !optionData.optionActive ? "Expired" : 
-                            timestampToDateTime(optionData.expirationDate)}
+                        {!optionData.optionReady && !optionData.optionActive
+                            ? "Expired"
+                            : timestampToDateTime(optionData.expirationDate)}
                     </div>
                 </div>
             </div>
@@ -326,7 +369,17 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 <ConnectWallet />
-                {isConnected &&
+                {isLoading ? (
+                    <Blocks
+                        visible={true}
+                        height="80"
+                        width="80"
+                        ariaLabel="blocks-loading"
+                        wrapperStyle={{}}
+                        wrapperClass="blocks-wrapper"
+                    />
+                ) : (
+                    isConnected &&
                     (optionData.optionReady ? (
                         <div style={{ marginTop: "20px" }}>
                             {optionData.reciever === address ? (
@@ -392,7 +445,8 @@ export default function User() {
                         <div style={{ marginTop: "20px" }}>
                             Option is not ready, already closed, or expire!
                         </div>
-                    ))}
+                    ))
+                )}
             </div>
         </div>
     );
