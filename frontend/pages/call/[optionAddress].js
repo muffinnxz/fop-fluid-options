@@ -35,7 +35,7 @@ export default function User() {
             checkUserUnderlyingAllowance();
             sfgetflow();
         }
-    }, [optionData, address, checkUserUnderlyingAllowance, sfgetflow]);
+    }, [optionData, address]);
 
     const timestampToDateTime = (timestamp) => {
         const date = new Date(parseInt(timestamp));
@@ -574,8 +574,9 @@ export default function User() {
                                 </div>
                             ) : (
                                 <div>
-                                    Option owner haven't approve the underlying
-                                    asset yet
+                                    {
+                                        " Option owner haven't approve the underlying asset yet "
+                                    }
                                 </div>
                             )}
                         </div>
