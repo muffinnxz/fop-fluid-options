@@ -26,31 +26,36 @@ const underlyAssetOptions = [
       address: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
       decimal: 18,
     },
-    label: "dai",
+    label: "fdai",
+    pricefeed: {
+      address: "0x0d79df66BE487753B02D015Fb622DED7f0E9798d",
+      decimal: 8,
+    },
   },
   {
     value: {
-      address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
       decimal: 18,
     },
-    label: "usdt",
+    label: "link",
+    pricefeed: {
+      address: "0x48731cF7e84dc94C5f84577882c14Be11a5B7456",
+      decimal: 8,
+    },
   },
+  // {
+  //   value: {
+  //     address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+  //     decimal: 18,
+  //   },
+  //   label: "usdt",
+  // },
 ];
 
-const priceFeedOptions = [
-  { value: "0x88271d333C72e51516B67f5567c728E702b3eeE8", label: "dai/usdt" },
-  { value: "0xdAC17F958D2ee523a2206206994597C13D831ec7", label: "usdt/dai" },
-];
-
-const underlyasset = {
-  dai: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
-};
-
-const optionsf = [
-  { value: "chocolate", label: "Chocolate" },
-  { value: "strawberry", label: "Strawberry" },
-  { value: "vanilla", label: "Vanilla" },
-];
+// const priceFeedOptions = [
+//   { value: "0x88271d333C72e51516B67f5567c728E702b3eeE8", label: "dai/usdt" },
+//   { value: "0xdAC17F958D2ee523a2206206994597C13D831ec7", label: "usdt/dai" },
+// ];
 
 export default function Home() {
   const web3 = new Web3(
@@ -64,11 +69,11 @@ export default function Home() {
 
   const [callOptions, setCallOptions] = useState([]);
   const [putOptions, setPutOptions] = useState([]);
-
+  const [selectToken, setSelectToken] = useState();
   const [optionType, setOptionType] = useState(OptionType.CALL);
 
   useEffect(() => {
-    getAllCallOption();
+    // getAllCallOption();
     // getAllPutOption();
   }, []);
 
@@ -115,6 +120,15 @@ export default function Home() {
 
   async function mintOption(e) {
     e.preventDefault();
+    let type = optionType == optionType.CALL ? "CALL" : "PUT";
+    let name =
+      String(selectToken.label) +
+      "-" +
+      e.target[5].value + // strike price
+      "-" +
+      e.target[9].value + // time
+      "-" +
+      type;
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -124,22 +138,32 @@ export default function Home() {
         optionType == "call" ? OptionFactory.abi : OptionPutFactory.abi,
         signer
       );
+
       try {
+        let now = new Date().toJSON().slice(0, 10);
+        if (e.target[9].value < now) {
+          // check date should be in future
+          throw "Date must be in the future";
+        }
+        if (optionType == "call" && e.target[5].value < e.target[2].value) {
+          // check call & strike price more than underlying
+          throw "strike price must be more than underlying";
+        }
         let addr = await signer.getAddress();
         optionType == "call"
           ? await contract.mintCallOption(
               addr,
-              e.target[1].value,
-              fDAIx,
-              dai,
-              e.target[3].value.address,
+              name,
+              fDAIx, //TODO: change if we have other option
+              dai, ////TODO: change if we have other option
+              String(selectToken.value.address),
               e.target[2].value,
-              e.target[3].value.decimal,
-              e.target[5].value,
-              e.target[6].value,
+              selectToken.value.decimal,
+              String(selectToken.pricefeed.address),
+              selectToken.pricefeed.decimal,
               e.target[7].value,
               getTime(e.target[9].value),
-              e.target[4].value
+              e.target[5].value
             )
           : await contract.mintPutOption(
               addr,
@@ -175,6 +199,10 @@ export default function Home() {
       }
     }
   }
+
+  const handleFieldChange = (_token) => {
+    setSelectToken(_token);
+  };
 
   function getTime(val) {
     return Date.parse(val);
@@ -216,14 +244,15 @@ export default function Home() {
                 <OptionTypeGroup></OptionTypeGroup>
               </div>
 
-              <Input clearable placeholder="Name" type="text" required></Input>
               <Input
                 clearable
                 placeholder="underlyamount"
                 type="number"
                 required
               ></Input>
+
               <DropDownList
+                onChangeF={handleFieldChange}
                 options={underlyAssetOptions}
                 placeholder="underlyasset"
               />
@@ -233,13 +262,13 @@ export default function Home() {
                 type="number"
                 required
               ></Input>
-              <DropDownList options={priceFeedOptions} placeholder="price" />
+              {/* <DropDownList options={priceFeedOptions} placeholder="price" />
               <Input
                 clearable
                 placeholder="price feed decimal"
                 type="number"
                 required
-              ></Input>
+              ></Input> */}
               <Input
                 clearable
                 placeholder="flow rate per sec"
@@ -253,22 +282,24 @@ export default function Home() {
                 required
               ></Input>
               <div></div>
-              <Button>create option</Button>
+              <Button type="submit">create option</Button>
             </form>
           </Card>
         </Container>
       </section>
 
-      <section>Call</section>
-      {callOptions.map((co, index) => {
-        return (
-          <div key={index}>
-            <a href={`/call/${co}`}>
-              {index + 1} address: {co}
-            </a>
-          </div>
-        );
-      })}
+      <section>
+        Call
+        {callOptions.map((co, index) => {
+          return (
+            <div key={index}>
+              <a href={`/call/${co}`}>
+                {index + 1} address: {co}
+              </a>
+            </div>
+          );
+        })}
+      </section>
       <section>Put</section>
     </div>
   );
