@@ -14,7 +14,8 @@ import {
     goerliTokenName,
 } from "../../datas/AddressDictionary";
 import ConnectWallet from "../../components/ConnectButton";
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function User() {
     const router = useRouter();
@@ -320,10 +321,24 @@ export default function User() {
                     }}
                 >
                     <QRCodeSVG
-                        value={"http://localhost:3000" + router.asPath}
+                        value={"https://fop-fluid-options.herokuapp.com/" + router.asPath}
                     />
                 </div>
-                <div>address : {optionData.address}</div>
+                <div>
+                    address : {optionData.address}
+                    <IconButton
+                        aria-label="Check in etherscan"
+                        onClick={() => {
+                            window.open(
+                                `https://goerli.etherscan.io/address/${optionData.address}`,
+                                "_blank",
+                                "noopener,noreferrer"
+                            );
+                        }}
+                    >
+                        <SearchIcon />
+                    </IconButton>
+                </div>
             </div>
             <div
                 className={styles.option_detail_card_list}
