@@ -68,7 +68,7 @@ export default function Home() {
   const [optionType, setOptionType] = useState(OptionType.CALL);
 
   useEffect(() => {
-    // getAllCallOption();
+    getAllCallOption();
     // getAllPutOption();
   }, []);
 
@@ -204,17 +204,18 @@ export default function Home() {
       <h1>All Option</h1>
       <ConnectWallet />
 
-      <section className="flex flex-col justify-center items-center space-y-3">
+      <section className="flex flex-col justify-center items-center space-y-3  mx-20">
         <Text>Mint option</Text>
         <Container>
           <Card css={{ padding: "$4 $4" }}>
             <form
               onSubmit={mintOption}
-              className="grid md:grid-cols-3 lg:grid-cols-4 space-x-2 space-y-3 items-center border-blue-200 border-solid border-2 p-2 rounded-xl"
+              className="grid md:grid-cols-3 lg:grid-cols-3 space-x-2 space-y-3 items-center border-blue-200 border-solid border-2 p-2 rounded-xl"
             >
-              <div className="flex justify-start">
+              <div className="flex justify-start ml-16 mt-3">
                 <OptionTypeGroup></OptionTypeGroup>
               </div>
+
               <Input clearable placeholder="Name" type="text" required></Input>
               <Input
                 clearable
@@ -251,6 +252,7 @@ export default function Home() {
                 type="date"
                 required
               ></Input>
+              <div></div>
               <Button>create option</Button>
             </form>
           </Card>
