@@ -16,7 +16,7 @@ export default function Navbar() {
         <div className="flex flex-row gap-x-10 ">
           <h2
             className="pt-2 text-teal-700 hover:text-white  "
-            onClick={() => router.push(`/`)}
+            onClick={() => router.push(`/call`)}
           >
             {" "}
             Call{" "}
@@ -25,7 +25,7 @@ export default function Navbar() {
         <div className="flex flex-row gap-x-10 ">
           <h2
             className="pt-2 text-teal-700 hover:text-white  "
-            onClick={() => router.push(`/`)}
+            onClick={() => router.push(`/put`)}
           >
             {" "}
             Put{" "}
@@ -36,10 +36,10 @@ export default function Navbar() {
       <div className="flex flex-row gap-6">
         <h2
           className="pt-2 text-teal-700 hover:text-white  pr-8 "
-          onClick={() => router.push(`/`)}
+          onClick={() => router.push(`/my-option`)}
         >
           {" "}
-          Create Option{" "}
+          My Option{" "}
         </h2>
         <ConnectWallet className="order-last " />
       </div>
