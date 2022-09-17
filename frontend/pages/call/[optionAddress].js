@@ -392,21 +392,20 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 <ConnectWallet />
-                {isLoading ||
-                !optionData ||
-                !underlyingAllowance ||
-                !flowRateInfo ? (
-                    <Blocks
-                        visible={true}
-                        height="80"
-                        width="80"
-                        ariaLabel="blocks-loading"
-                        wrapperStyle={{}}
-                        wrapperClass="blocks-wrapper"
-                    />
-                ) : (
-                    isConnected &&
-                    (optionData.optionReady ? (
+                {isConnected &&
+                    (isLoading ||
+                    !optionData ||
+                    !underlyingAllowance ||
+                    !flowRateInfo ? (
+                        <Blocks
+                            visible={true}
+                            height="80"
+                            width="80"
+                            ariaLabel="blocks-loading"
+                            wrapperStyle={{}}
+                            wrapperClass="blocks-wrapper"
+                        />
+                    ) : optionData.optionReady ? (
                         <div style={{ marginTop: "20px", minWidth: "60%" }}>
                             {optionData.reciever === address ? (
                                 underlyingAllowance >=
@@ -584,8 +583,7 @@ export default function User() {
                         <div style={{ marginTop: "20px" }}>
                             Option is not ready, already closed, or expire!
                         </div>
-                    ))
-                )}
+                    ))}
             </div>
         </div>
     );
