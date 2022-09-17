@@ -21,6 +21,7 @@ export default function User() {
     const { address, isConnected } = useAccount();
     const [optionData, setOptionData] = useState();
     const [underlyingAllowance, setUnderlyingAllowance] = useState();
+    const [flowRateInfo, setFlowRateInfo] = useState();
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -30,8 +31,9 @@ export default function User() {
     }, [router.isReady]);
 
     useEffect(() => {
-        if (optionData && address && optionData.reciever === address) {
+        if (optionData && address) {
             checkUserUnderlyingAllowance();
+            sfgetflow();
         }
     }, [optionData, address]);
 
@@ -42,6 +44,7 @@ export default function User() {
     };
 
     const checkUserUnderlyingAllowance = async () => {
+        setIsLoading(true);
         const provider = ethers.getDefaultProvider("goerli");
         const link = new ethers.Contract(
             optionData.underlyingAsset,
@@ -50,13 +53,14 @@ export default function User() {
         );
         try {
             let underlyingAllowance = await link.allowance(
-                address,
+                optionData.reciever,
                 router.query.optionAddress
             );
             setUnderlyingAllowance(underlyingAllowance);
         } catch (err) {
             console.log("Error: ", err);
         }
+        setIsLoading(false);
     };
 
     const getContractData = async (address) => {
@@ -67,30 +71,35 @@ export default function User() {
             provider
         );
         try {
-            const reciever = await contract._receiver();
-            const underlyingAsset = await contract._underlyingAsset();
-            const underlyingAmount = await contract._underlyingAmount();
-            const purchasingAsset = await contract._dai();
-            const purchasingAmount = await contract._strikePrice();
-            const priceFeed = await contract._priceFeed();
-            const flowAsset = await contract._acceptedToken();
-            const requiredFlowRate = await contract._requiredFlowRate();
-            const expirationDate = await contract._expirationDate();
-            const optionReady = await contract.optionReady();
-            const optionActive = await contract.optionActive();
-            setOptionData({
-                address: address,
-                reciever: reciever,
-                underlyingAsset: underlyingAsset,
-                underlyingAmount: underlyingAmount,
-                purchasingAsset: purchasingAsset,
-                purchasingAmount: purchasingAmount,
-                priceFeed: priceFeed,
-                flowAsset: flowAsset,
-                requiredFlowRate: requiredFlowRate,
-                expirationDate: expirationDate,
-                optionReady: optionReady,
-                optionActive: optionActive,
+            Promise.all([
+                contract._receiver(),
+                contract._underlyingAsset(),
+                contract._underlyingAmount(),
+                contract._dai(),
+                contract._strikePrice(),
+                contract._priceFeed(),
+                contract._acceptedToken(),
+                contract._requiredFlowRate(),
+                contract._expirationDate(),
+                contract.optionReady(),
+                contract.optionActive(),
+            ]).then((values) => {
+                const optionData = {
+                    address: address,
+                    reciever: values[0],
+                    underlyingAsset: values[1],
+                    underlyingAmount: values[2],
+                    purchasingAsset: values[3],
+                    purchasingAmount: values[4],
+                    priceFeed: values[5],
+                    flowAsset: values[6],
+                    requiredFlowRate: values[7],
+                    expirationDate: values[8],
+                    optionReady: values[9],
+                    optionActive: values[10],
+                };
+                console.log("Option Data", optionData);
+                setOptionData(optionData);
             });
         } catch (err) {
             console.log("Error: ", err);
@@ -98,6 +107,7 @@ export default function User() {
     };
 
     const approveUnderlyingAsset = async () => {
+        setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(
@@ -118,13 +128,15 @@ export default function User() {
                 underlyingAmount
             );
             await tx.wait();
+            await checkUserUnderlyingAllowance();
         } catch (err) {
             console.log("Error: ", err);
         }
+        setIsLoading(false);
     };
 
-    //where the Superfluid logic takes place
-    async function createNewFlow(recipient, flowRate) {
+    async function sfcreatflow() {
+        setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
 
         const signer = provider.getSigner();
@@ -142,8 +154,10 @@ export default function User() {
 
         try {
             const createFlowOperation = sf.cfaV1.createFlow({
-                receiver: recipient,
-                flowRate: flowRate,
+                receiver: router.query.optionAddress,
+                flowRate: ethers.BigNumber.from(
+                    optionData.requiredFlowRate
+                ).toString(),
                 superToken: DAIx,
                 // userData?: string
             });
@@ -156,9 +170,9 @@ export default function User() {
             console.log(
                 `Congrats - you've just created a money stream!
                 View Your Stream At: https://app.superfluid.finance/dashboard/${recipient}
-                Network: Kovan
+                Network: Goerli
                 Super Token: DAIx
-                Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
+                Sender: ${address}
                 Receiver: ${recipient},
                 FlowRate: ${flowRate}
                 `
@@ -169,29 +183,11 @@ export default function User() {
             );
             console.error(error);
         }
+        setIsLoading(false);
     }
 
-    const createFlow = async () => {
-        console.log("Start create flow...");
-        const provider = ethers.getDefaultProvider("goerli");
-        const contract = new ethers.Contract(
-            router.query.optionAddress,
-            TradeableCallOption.abi,
-            provider
-        );
-        const flowRate = await contract._requiredFlowRate();
-        console.log(
-            router.query.optionAddress,
-            ethers.BigNumber.from(optionData.requiredFlowRate).toString()
-        );
-        await createNewFlow(
-            router.query.optionAddress,
-            ethers.BigNumber.from(flowRate).toString()
-        );
-    };
-
-    //where the Superfluid logic takes place
-    async function deleteFlow(recipient) {
+    async function sfdeleteflow() {
+        setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
 
         const signer = provider.getSigner();
@@ -210,7 +206,7 @@ export default function User() {
         try {
             const deleteFlowOperation = sf.cfaV1.deleteFlow({
                 sender: address,
-                receiver: recipient,
+                receiver: router.query.optionAddress,
                 superToken: DAIx,
                 // userData?: string
             });
@@ -221,18 +217,55 @@ export default function User() {
 
             console.log(
                 `Congrats - you've just deleted your money stream!
-         Network: Kovan
-         Super Token: DAIx
-         Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
-         Receiver: ${recipient}
-      `
+                    Network: Kovan
+                    Super Token: DAIx
+                    Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
+                    Receiver: ${recipient}
+                `
             );
         } catch (error) {
             console.error(error);
         }
+        setIsLoading(false);
+    }
+
+    async function sfgetflow() {
+        setIsLoading(true);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        const signer = provider.getSigner();
+
+        const chainId = await window.ethereum.request({
+            method: "eth_chainId",
+        });
+        const sf = await Framework.create({
+            chainId: Number(chainId),
+            provider: provider,
+        });
+
+        const DAIxContract = await sf.loadSuperToken("fDAIx");
+        const DAIx = DAIxContract.address;
+
+        try {
+            const flowInfo = await sf.cfaV1.getFlow({
+                superToken: DAIx,
+                sender: address,
+                receiver: router.query.optionAddress,
+                providerOrSigner: provider,
+            });
+            console.log("flowInfo", flowInfo);
+            setFlowRateInfo(flowInfo);
+        } catch (error) {
+            console.log(
+                "Hmmm, your transaction threw an error. Make sure that this stream does not already exist, and that you've entered a valid Ethereum address!"
+            );
+            console.error(error);
+        }
+        setIsLoading(false);
     }
 
     const exerciseOption = async () => {
+        setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(
@@ -254,8 +287,10 @@ export default function User() {
             await tx.wait();
             let tx2 = await contract.exerciseOption();
             await tx2.wait();
+            setIsLoading(false);
         } catch (err) {
             console.log("Error: ", err);
+            setIsLoading(false);
         }
     };
 
@@ -325,7 +360,8 @@ export default function User() {
                         {(
                             optionData.underlyingAmount /
                             goerliTokenDecimal[optionData.underlyingAsset]
-                        ).toString()}
+                        ).toFixed(12)
+                        .toString()}
                     </div>
                 </div>
                 <div className={styles.option_detail_card}>
@@ -336,7 +372,8 @@ export default function User() {
                         {(
                             optionData.purchasingAmount /
                             goerliTokenDecimal[optionData.purchasingAsset]
-                        ).toString()}
+                        ).toFixed(12)
+                        .toString()}
                     </div>
                 </div>
                 <div className={styles.option_detail_card}>
@@ -369,7 +406,10 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 <ConnectWallet />
-                {isLoading ? (
+                {isLoading ||
+                !optionData ||
+                !underlyingAllowance ||
+                !flowRateInfo ? (
                     <Blocks
                         visible={true}
                         height="80"
@@ -381,63 +421,171 @@ export default function User() {
                 ) : (
                     isConnected &&
                     (optionData.optionReady ? (
-                        <div style={{ marginTop: "20px" }}>
+                        <div style={{ marginTop: "20px", minWidth: "60%" }}>
                             {optionData.reciever === address ? (
-                                underlyingAllowance ? (
-                                    underlyingAllowance >=
-                                    optionData.underlyingAmount ? (
-                                        <div>
-                                            You already approve sufficient
-                                            amount of the underlying asset (
-                                            {
-                                                goerliTokenName[
-                                                    optionData.underlyingAsset
-                                                ]
-                                            }
-                                            )
+                                underlyingAllowance >=
+                                optionData.underlyingAmount ? (
+                                    <div>
+                                        You already approve sufficient amount of
+                                        the underlying asset (
+                                        {
+                                            goerliTokenName[
+                                                optionData.underlyingAsset
+                                            ]
+                                        }
+                                        )
+                                    </div>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            approveUnderlyingAsset();
+                                        }}
+                                    >
+                                        Approving Underlying Asset
+                                    </Button>
+                                )
+                            ) : optionData.optionActive ||
+                              underlyingAllowance >=
+                                  optionData.underlyingAmount ? (
+                                <div>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            marginBottom: "20px",
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <div>
+                                                Total{" "}
+                                                {
+                                                    goerliTokenName[
+                                                        optionData.flowAsset
+                                                    ]
+                                                }{" "}
+                                                flow:
+                                            </div>
+                                            <div>
+                                                {(
+                                                    flowRateInfo.deposit /
+                                                    goerliTokenDecimal[
+                                                        optionData.flowAsset
+                                                    ]
+                                                )
+                                                    .toFixed(12)
+                                                    .toString()}
+                                            </div>
                                         </div>
-                                    ) : (
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <div>
+                                                Current{" "}
+                                                {
+                                                    goerliTokenName[
+                                                        optionData.flowAsset
+                                                    ]
+                                                }{" "}
+                                                flow / day:
+                                            </div>
+                                            <div>
+                                                {(
+                                                    (flowRateInfo.flowRate /
+                                                        goerliTokenDecimal[
+                                                            optionData.flowAsset
+                                                        ]) *
+                                                    86400
+                                                )
+                                                    .toFixed(12)
+                                                    .toString()}
+                                            </div>
+                                        </div>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <div>
+                                                Owed{" "}
+                                                {
+                                                    goerliTokenName[
+                                                        optionData.flowAsset
+                                                    ]
+                                                }{" "}
+                                                Flow:
+                                            </div>
+                                            <div>
+                                                {flowRateInfo.owedDeposit /
+                                                    goerliTokenDecimal[
+                                                        optionData.flowAsset
+                                                    ]}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            justifyContent: "space-around",
+                                        }}
+                                    >
+                                        {ethers.BigNumber.from(flowRateInfo.flowRate) <
+                                            optionData.requiredFlowRate}
                                         <Button
                                             variant="contained"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                approveUnderlyingAsset();
+                                                sfcreatflow();
                                             }}
                                         >
-                                            Approving Underlying Asset
+                                            Create Flow
                                         </Button>
-                                    )
-                                ) : (
-                                    <Blocks
-                                        visible={true}
-                                        height="40"
-                                        width="40"
-                                        ariaLabel="blocks-loading"
-                                        wrapperStyle={{}}
-                                        wrapperClass="blocks-wrapper"
-                                    />
-                                )
+                                        {ethers.BigNumber.from(flowRateInfo.flowRate) > 0 && (
+                                            <Button
+                                                variant="contained"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    sfdeleteflow();
+                                                }}
+                                                style={{ marginLeft: "20px" }}
+                                            >
+                                                Delete Flow
+                                            </Button>
+                                        )}
+                                        {ethers.BigNumber.from(flowRateInfo.flowRate) >=
+                                            optionData.requiredFlowRate && (
+                                            <Button
+                                                variant="contained"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    exerciseOption();
+                                                }}
+                                                style={{ marginLeft: "20px" }}
+                                            >
+                                                Exercise Option
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
                             ) : (
                                 <div>
-                                    <Button
-                                        variant="contained"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            createFlow();
-                                        }}
-                                    >
-                                        Create Flow
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            exerciseOption();
-                                        }}
-                                        style={{ marginLeft: "20px" }}
-                                    >
-                                        Exercise Option
-                                    </Button>
+                                    Option owner haven't approve the underlying
+                                    asset yet
                                 </div>
                             )}
                         </div>
