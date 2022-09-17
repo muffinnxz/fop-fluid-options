@@ -22,6 +22,5 @@
     "engines": {
         "node": "14.18.0",
         "npm": "8.5.5"
-    },
-    "cacheDirectories": ["./frontend/.next/cache"]
+    }
 }
