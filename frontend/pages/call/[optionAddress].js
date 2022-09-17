@@ -14,7 +14,8 @@ import {
     goerliTokenName,
 } from "../../datas/AddressDictionary";
 import ConnectWallet from "../../components/ConnectButton";
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function User() {
     const router = useRouter();
@@ -323,7 +324,21 @@ export default function User() {
                         value={"https://fop-fluid-options.herokuapp.com/" + router.asPath}
                     />
                 </div>
-                <div>address : {optionData.address}</div>
+                <div>
+                    address : {optionData.address}
+                    <IconButton
+                        aria-label="Check in etherscan"
+                        onClick={() => {
+                            window.open(
+                                `https://goerli.etherscan.io/address/${optionData.address}`,
+                                "_blank",
+                                "noopener,noreferrer"
+                            );
+                        }}
+                    >
+                        <SearchIcon />
+                    </IconButton>
+                </div>
             </div>
             <div
                 className={styles.option_detail_card_list}
@@ -392,21 +407,20 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 <ConnectWallet />
-                {isLoading ||
-                !optionData ||
-                !underlyingAllowance ||
-                !flowRateInfo ? (
-                    <Blocks
-                        visible={true}
-                        height="80"
-                        width="80"
-                        ariaLabel="blocks-loading"
-                        wrapperStyle={{}}
-                        wrapperClass="blocks-wrapper"
-                    />
-                ) : (
-                    isConnected &&
-                    (optionData.optionReady ? (
+                {isConnected &&
+                    (isLoading ||
+                    !optionData ||
+                    !underlyingAllowance ||
+                    !flowRateInfo ? (
+                        <Blocks
+                            visible={true}
+                            height="80"
+                            width="80"
+                            ariaLabel="blocks-loading"
+                            wrapperStyle={{}}
+                            wrapperClass="blocks-wrapper"
+                        />
+                    ) : optionData.optionReady ? (
                         <div style={{ marginTop: "20px", minWidth: "60%" }}>
                             {optionData.reciever === address ? (
                                 underlyingAllowance >=
@@ -584,8 +598,7 @@ export default function User() {
                         <div style={{ marginTop: "20px" }}>
                             Option is not ready, already closed, or expire!
                         </div>
-                    ))
-                )}
+                    ))}
             </div>
         </div>
     );
