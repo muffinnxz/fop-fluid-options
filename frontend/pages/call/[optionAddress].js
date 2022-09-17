@@ -28,14 +28,14 @@ export default function User() {
         if (router.isReady) {
             getContractData(router.query.optionAddress);
         }
-    }, [router.isReady]);
+    }, [router.isReady, router.query.optionAddress]);
 
     useEffect(() => {
         if (optionData && address) {
             checkUserUnderlyingAllowance();
             sfgetflow();
         }
-    }, [optionData, address]);
+    }, [optionData, address, checkUserUnderlyingAllowance, sfgetflow]);
 
     const timestampToDateTime = (timestamp) => {
         const date = new Date(parseInt(timestamp));
@@ -167,16 +167,7 @@ export default function User() {
             const result = await createFlowOperation.exec(signer);
             console.log(result);
 
-            console.log(
-                `Congrats - you've just created a money stream!
-                View Your Stream At: https://app.superfluid.finance/dashboard/${recipient}
-                Network: Goerli
-                Super Token: DAIx
-                Sender: ${address}
-                Receiver: ${recipient},
-                FlowRate: ${flowRate}
-                `
-            );
+            console.log("successfully create flow");
         } catch (error) {
             console.log(
                 "Hmmm, your transaction threw an error. Make sure that this stream does not already exist, and that you've entered a valid Ethereum address!"
@@ -215,14 +206,7 @@ export default function User() {
 
             await deleteFlowOperation.exec(signer);
 
-            console.log(
-                `Congrats - you've just deleted your money stream!
-                    Network: Kovan
-                    Super Token: DAIx
-                    Sender: 0xDCB45e4f6762C3D7C61a00e96Fb94ADb7Cf27721
-                    Receiver: ${recipient}
-                `
-            );
+            console.log("successfully delete flow");
         } catch (error) {
             console.error(error);
         }
@@ -360,8 +344,9 @@ export default function User() {
                         {(
                             optionData.underlyingAmount /
                             goerliTokenDecimal[optionData.underlyingAsset]
-                        ).toFixed(12)
-                        .toString()}
+                        )
+                            .toFixed(12)
+                            .toString()}
                     </div>
                 </div>
                 <div className={styles.option_detail_card}>
@@ -372,8 +357,9 @@ export default function User() {
                         {(
                             optionData.purchasingAmount /
                             goerliTokenDecimal[optionData.purchasingAsset]
-                        ).toFixed(12)
-                        .toString()}
+                        )
+                            .toFixed(12)
+                            .toString()}
                     </div>
                 </div>
                 <div className={styles.option_detail_card}>
@@ -544,8 +530,9 @@ export default function User() {
                                             justifyContent: "space-around",
                                         }}
                                     >
-                                        {ethers.BigNumber.from(flowRateInfo.flowRate) <
-                                            optionData.requiredFlowRate}
+                                        {ethers.BigNumber.from(
+                                            flowRateInfo.flowRate
+                                        ) < optionData.requiredFlowRate}
                                         <Button
                                             variant="contained"
                                             onClick={(e) => {
@@ -555,7 +542,9 @@ export default function User() {
                                         >
                                             Create Flow
                                         </Button>
-                                        {ethers.BigNumber.from(flowRateInfo.flowRate) > 0 && (
+                                        {ethers.BigNumber.from(
+                                            flowRateInfo.flowRate
+                                        ) > 0 && (
                                             <Button
                                                 variant="contained"
                                                 onClick={(e) => {
@@ -567,8 +556,9 @@ export default function User() {
                                                 Delete Flow
                                             </Button>
                                         )}
-                                        {ethers.BigNumber.from(flowRateInfo.flowRate) >=
-                                            optionData.requiredFlowRate && (
+                                        {ethers.BigNumber.from(
+                                            flowRateInfo.flowRate
+                                        ) >= optionData.requiredFlowRate && (
                                             <Button
                                                 variant="contained"
                                                 onClick={(e) => {
