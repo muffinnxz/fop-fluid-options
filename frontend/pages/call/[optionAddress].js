@@ -320,7 +320,7 @@ export default function User() {
                     }}
                 >
                     <QRCodeSVG
-                        value={"http://localhost:3000" + router.asPath}
+                        value={"https://fop-fluid-options.herokuapp.com/" + router.asPath}
                     />
                 </div>
                 <div>address : {optionData.address}</div>
