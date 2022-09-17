@@ -9,7 +9,7 @@ export default function User() {
   useEffect(() => {
     setUserWalletAddress(router.query.wallet);
     !router.isReady ? console.log("loading") : console.log("ready");
-  }, [router.isReady]);
+  }, [router.isReady, router.query.wallet]);
 
   return (
     <div className=" h-screen">
