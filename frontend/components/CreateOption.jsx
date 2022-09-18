@@ -25,7 +25,7 @@ const underlyAssetOptions = [
       address: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
       decimal: 18,
     },
-    label: "fdai",
+    label: "fDAI",
     pricefeed: {
       address: "0x0d79df66BE487753B02D015Fb622DED7f0E9798d",
       decimal: 8,
@@ -36,7 +36,7 @@ const underlyAssetOptions = [
       address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
       decimal: 18,
     },
-    label: "link",
+    label: "LINK",
     pricefeed: {
       address: "0x48731cF7e84dc94C5f84577882c14Be11a5B7456",
       decimal: 8,
@@ -90,15 +90,31 @@ export default function CreateOption() {
 
   async function mintOption(e) {
     e.preventDefault();
-    let type = optionType == optionType.CALL ? "CALL" : "PUT";
+    let type = optionType == "call" ? "CALL" : "PUT";
+    let date = String(new Date(e.target[9].value));
+    let format_date =
+      date.substring(8, 10) + date.substring(4, 7) + date.substring(11, 15);
     let name =
-      String(selectToken.label) +
+      type +
       "-" +
-      e.target[5].value + // strike price
+      e.target[5].value +
       "-" +
-      e.target[9].value + // time
+      "[" +
+      selectToken.label +
+      "/" +
+      "fDAI" +
+      "]" +
       "-" +
-      type;
+      "[" +
+      e.target[2].value +
+      "/" +
+      e.target[5].value +
+      "]" +
+      "-" +
+      "fDAIx" +
+      "-" +
+      format_date;
+    console.log(name);
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
