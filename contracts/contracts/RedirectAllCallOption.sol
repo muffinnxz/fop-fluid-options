@@ -185,7 +185,8 @@ contract RedirectAllCallOption is SuperAppBase {
         } else {
             //exercise the option
             //get current price of the underlying asset using chainlink
-            (, int256 currentPrice, , , ) = _priceFeed.latestRoundData();
+            (, int256 currentPrice, , , ) = _priceFeed.latestRoundData() *
+                (underlyingAmount / (10**underlyingDecimals)); // current price for checking with total strike price
 
             //adjust current price if the price feed decimals and underlying decimals are different
             //this is important for comparison between current price and strike price

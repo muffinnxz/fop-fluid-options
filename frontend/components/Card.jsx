@@ -45,7 +45,7 @@ export default function Card({ type, option }) {
         });
         contract._strikePrice().then((data) => {
           let price = h2d(data._hex);
-          setStrike(price / 10 ** 18);
+          setStrike(price / 10 ** 18); // TODO: FIX TO IT's DECIMAL // FIX TO PUT
         });
       } catch (err) {
         console.log("Error: ", err);
