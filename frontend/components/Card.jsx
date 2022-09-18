@@ -3,6 +3,8 @@ import TradeablePutOption from "../../contracts/artifacts/contracts/TradeablePut
 import TradeableCallOption from "../../contracts/artifacts/contracts/TradeableCallOption.sol/TradeableCallOption.json";
 import { ethers } from "ethers";
 import h2d from "../utils/h2d";
+import makeBlockie from "ethereum-blockies-base64";
+
 const Web3 = require("web3");
 
 export default function Card({ type, option }) {
@@ -53,6 +55,7 @@ export default function Card({ type, option }) {
     }
   }
   return (
+
     <footer className="px-8  mx-16  py-3 border rounded-lg bg-teal-50 grid grid-cols-7 gap-4">
       <div className="px-14 col-span-3">{name}</div>
       <div>{strike}</div>
