@@ -5,12 +5,9 @@ import { useState } from "react";
 import Web3 from "web3";
 
 import Call from "../components/Call";
+import Card from "../components/Card";
 
 export default function Home() {
-  const web3 = new Web3(
-    new Web3.providers.HttpProvider(process.env.GOERLI_ALCHEMY_URL)
-  );
-
   const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
   const PutFactoryAddress = "0x264569c1325C26e41832dE6C8D978d59fCb05D60";
   const fDAIx = "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00";
@@ -42,6 +39,7 @@ export default function Home() {
 
       <section>
         <Call />
+        {/* <Card type="call" option="0xBD6D2350eB0e4D157eF5D22a71eD9F8fB3FfF28D" /> */}
       </section>
       <section>Put</section>
     </div>
