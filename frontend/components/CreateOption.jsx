@@ -97,7 +97,7 @@ export default function CreateOption() {
     let name =
       type +
       "-" +
-      e.target[5].value +
+      String(parseInt(e.target[5].value) / parseInt(e.target[2].value)) +
       "-" +
       "[" +
       selectToken.label +
@@ -124,6 +124,14 @@ export default function CreateOption() {
         optionType == "call" ? OptionFactory.abi : OptionPutFactory.abi,
         signer
       );
+      console.log(
+        ethers.utils.parseEther(e.target[2].value),
+        e.target[2].value
+      );
+      console.log(
+        ethers.utils.parseEther(e.target[5].value),
+        e.target[5].value
+      );
 
       try {
         let now = new Date().toJSON().slice(0, 10);
@@ -143,13 +151,14 @@ export default function CreateOption() {
               fDAIx, //TODO: change if we have other option
               dai, ////TODO: change if we have other option
               String(selectToken.value.address),
-              e.target[2].value,
+              ethers.utils.parseEther(e.target[2].value)._hex, // TODO might change if decimal is not 18 but this case is link
               selectToken.value.decimal,
               String(selectToken.pricefeed.address),
               selectToken.pricefeed.decimal,
               e.target[7].value,
               getTime(e.target[9].value),
-              e.target[5].value
+              ethers.utils.parseEther(e.target[5].value)._hex
+              // web3.utils.toWei(e.target[2].value, "ether") // TODO might change if decimal is not 18 but this case is dai
             )
           : await contract.mintPutOption(
               addr,

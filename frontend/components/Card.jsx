@@ -53,8 +53,8 @@ export default function Card({ type, option }) {
     }
   }
   return (
-    <footer className="px-8  ml-16 mr-64 py-3 border rounded-lg bg-teal-50 grid grid-cols-6 gap-4">
-      <div className="px-14 col-span-2">{name}</div>
+    <footer className="px-8  mx-16  py-3 border rounded-lg bg-teal-50 grid grid-cols-7 gap-4">
+      <div className="px-14 col-span-3">{name}</div>
       <div>{strike}</div>
 
       <div>{expiry}</div>

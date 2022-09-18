@@ -208,6 +208,10 @@ export default function User() {
     }
     setIsLoading(false);
   }
+  function getDate(x) {
+    const myDate = new Date(x * 1000);
+    return myDate;
+  }
 
   async function sfgetflow() {
     setIsLoading(true);
@@ -386,9 +390,14 @@ export default function User() {
         <div className={styles.option_detail_card}>
           <div className={styles.option_detail_card_title}>Expiration</div>
           <div className={styles.option_detail_card_value}>
-            {!optionData.optionReady && !optionData.optionActive
-              ? "Expired"
-              : timestampToDateTime(optionData.expirationDate)}
+            {
+              !optionData.optionReady && !optionData.optionActive
+                ? "Expired"
+                : getDate(optionData.expirationDate)
+                    .toLocaleString()
+                    .substring(0, 9)
+              // : timestampToDateTime(optionData.expirationDate)
+            }
           </div>
         </div>
       </div>
