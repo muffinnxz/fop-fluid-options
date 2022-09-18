@@ -1,5 +1,6 @@
 import Call from "../../components/Call";
 import CreateOption from "../../components/CreateOption";
+import MyCall from "../../components/MyCall";
 
 export default function User() {
   return (
@@ -11,7 +12,7 @@ export default function User() {
 
       <section>
         Seller:
-        <br /> Call:
+        <MyCall />
         <br /> Put:
         <br />
       </section>

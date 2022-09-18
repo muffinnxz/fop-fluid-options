@@ -25,7 +25,7 @@ const underlyAssetOptions = [
       address: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
       decimal: 18,
     },
-    label: "fdai",
+    label: "fDAI",
     pricefeed: {
       address: "0x0d79df66BE487753B02D015Fb622DED7f0E9798d",
       decimal: 8,
@@ -36,7 +36,7 @@ const underlyAssetOptions = [
       address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
       decimal: 18,
     },
-    label: "link",
+    label: "LINK",
     pricefeed: {
       address: "0x48731cF7e84dc94C5f84577882c14Be11a5B7456",
       decimal: 8,
@@ -65,7 +65,8 @@ export default function CreateOption() {
   };
 
   function getTime(val) {
-    return Date.parse(val);
+    val = new Date(val);
+    return val.getTime() / 1000.0;
   }
 
   const OptionTypeGroup = () => {
@@ -89,15 +90,31 @@ export default function CreateOption() {
 
   async function mintOption(e) {
     e.preventDefault();
-    let type = optionType == optionType.CALL ? "CALL" : "PUT";
+    let type = optionType == "call" ? "CALL" : "PUT";
+    let date = String(new Date(e.target[9].value));
+    let format_date =
+      date.substring(8, 10) + date.substring(4, 7) + date.substring(11, 15);
     let name =
-      String(selectToken.label) +
+      type +
       "-" +
-      e.target[5].value + // strike price
+      String(parseInt(e.target[5].value) / parseInt(e.target[2].value)) +
       "-" +
-      e.target[9].value + // time
+      "[" +
+      selectToken.label +
+      "/" +
+      "fDAI" +
+      "]" +
       "-" +
-      type;
+      "[" +
+      e.target[2].value +
+      "/" +
+      e.target[5].value +
+      "]" +
+      "-" +
+      "fDAIx" +
+      "-" +
+      format_date;
+    console.log(name);
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -106,6 +123,14 @@ export default function CreateOption() {
         optionType == "call" ? CallFactoryAddress : PutFactoryAddress,
         optionType == "call" ? OptionFactory.abi : OptionPutFactory.abi,
         signer
+      );
+      console.log(
+        ethers.utils.parseEther(e.target[2].value),
+        e.target[2].value
+      );
+      console.log(
+        ethers.utils.parseEther(e.target[5].value),
+        e.target[5].value
       );
 
       try {
@@ -126,13 +151,14 @@ export default function CreateOption() {
               fDAIx, //TODO: change if we have other option
               dai, ////TODO: change if we have other option
               String(selectToken.value.address),
-              e.target[2].value,
+              ethers.utils.parseEther(e.target[2].value)._hex, // TODO might change if decimal is not 18 but this case is link
               selectToken.value.decimal,
               String(selectToken.pricefeed.address),
               selectToken.pricefeed.decimal,
               e.target[7].value,
               getTime(e.target[9].value),
-              e.target[5].value
+              ethers.utils.parseEther(e.target[5].value)._hex
+              // web3.utils.toWei(e.target[2].value, "ether") // TODO might change if decimal is not 18 but this case is dai
             )
           : await contract.mintPutOption(
               addr,
