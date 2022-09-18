@@ -12,6 +12,7 @@
     "@chainlink/contracts": "^0.4.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "@mui/icons-material": "^5.10.3",
     "@mui/material": "^5.10.5",
     "@nextui-org/react": "^1.0.0-beta.10",
     "@openzeppelin/contracts": "^4.7.2",
