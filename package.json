@@ -1,0 +1,26 @@
+{
+    "name": "fop-fluid-options",
+    "version": "1.0.0",
+    "description": "Streaming Options Marketplace submitted for ETHOnline2022",
+    "main": "index.js",
+    "scripts": {
+        "dev": "cd frontend && npm run dev",
+        "build": "cd frontend/ && npm run build",
+        "start": "cd frontend/ && npm start",
+        "heroku-prebuild": "NODE_ENV=production cd frontend/ && npm install && npm install --dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mrmuffinnxz/fop-fluid-options.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/mrmuffinnxz/fop-fluid-options/issues"
+    },
+    "homepage": "https://github.com/mrmuffinnxz/fop-fluid-options#readme",
+    "engines": {
+        "node": "14.18.0",
+        "npm": "8.5.5"
+    }
+}
