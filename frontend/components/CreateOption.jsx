@@ -65,7 +65,8 @@ export default function CreateOption() {
   };
 
   function getTime(val) {
-    return Date.parse(val);
+    val = new Date(val);
+    return val.getTime() / 1000.0;
   }
 
   const OptionTypeGroup = () => {
