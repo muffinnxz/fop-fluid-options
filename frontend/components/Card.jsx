@@ -16,7 +16,7 @@ export default function Card({ type, option }) {
 
   useEffect(() => {
     getAllInformation(option);
-  }, []);
+  }, [option]);
 
   function getDate(x) {
     const myDate = new Date(x * 1000);
