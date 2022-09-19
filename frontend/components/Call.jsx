@@ -33,8 +33,6 @@ export default function Call() {
   }
   return (
     <div>
-      {" "}
-      Call
       {callOptions.map((co, index) => {
         return (
           <div key={index}>

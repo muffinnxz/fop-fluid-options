@@ -196,8 +196,7 @@ export default function CreateOption() {
     }
   }
   return (
-    <section className="flex flex-col justify-center items-center space-y-3  mx-20">
-      <Text>Mint option</Text>
+    <section className="flex flex-col justify-center items-center space-y-3  mx-20 mt-6">
       <Container>
         <Card css={{ padding: "$4 $4" }}>
           <form
