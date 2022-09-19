@@ -4,6 +4,7 @@ import TradeableCallOption from "../../contracts/artifacts/contracts/TradeableCa
 import { ethers } from "ethers";
 import h2d from "../utils/h2d";
 import makeBlockie from "ethereum-blockies-base64";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 
 const Web3 = require("web3");
 
@@ -47,7 +48,8 @@ export default function Card({ type, option }) {
         });
         contract._strikePrice().then((data) => {
           let price = h2d(data._hex);
-          setStrike(price / 10 ** 18); // TODO: FIX TO IT's DECIMAL // FIX TO PUT
+          console.log(formatUnits(price, 18));
+          setStrike(formatUnits(price, 18)); // TODO: FIX TO IT's DECIMAL // FIX TO PUT
         });
       } catch (err) {
         console.log("Error: ", err);
@@ -55,21 +57,28 @@ export default function Card({ type, option }) {
     }
   }
   return (
+    <footer className="px-10  mx-20  py-3 border rounded-lg bg-teal-50 grid grid-cols-4 gap-4">
+      <div className="pl-8 col-span-2">{name}</div>
 
-    <footer className="px-8  mx-16  py-3 border rounded-lg bg-teal-50 grid grid-cols-7 gap-4">
-      <div className="px-14 col-span-3">{name}</div>
-      <div>{strike}</div>
+      {/* <div ></div> */}
+      <div className="-ml-16 flex flex-row justify-start gap-12">
+        <h1 className=" w-20">{strike}</h1>
+        <h1 className="w-20">{expiry}</h1>
 
-      <div>{expiry}</div>
-      <div
-        className={`border px-1 rounded-md justify-self-center ${
-          type == "call" ? "bg-green-200" : "bg-red-200"
-        }
+        <div
+          className={`border px-1 rounded-md justify-self-center ${
+            type == "call" ? "bg-green-200" : "bg-red-200"
+          }
           ${type == "call" ? "text-green-800" : "text-red-800"}`}
-      >
-        {type == "call" ? "Call" : "Put"}
+        >
+          {type == "call" ? "Call" : "Put"}
+        </div>
       </div>
-      <div>{owner}</div>
+
+      <div className="flex flex-row justify-center gap-4">
+        <img src={makeBlockie(String(owner))} className="w-8 h-8" />
+        <h1 className="w-32">{owner}</h1>
+      </div>
     </footer>
   );
 }
