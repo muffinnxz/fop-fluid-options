@@ -17,7 +17,7 @@ export default function User() {
       <div className="ml-32 mt-8 gap-2 flex flex-row w-64">
         Filter by:
         <div className="border px-1  py-1 -mt-1 gap-1 rounded-md flex flex-row">
-          <div class="flex  items-center ">
+          <div className="flex  items-center ">
             <button
               className={`rounded-xl border ${
                 filterCall ? "bg-teal-400 text-white" : ""
@@ -28,7 +28,7 @@ export default function User() {
               Call
             </button>
           </div>
-          <div class="flex items-center">
+          <div className="flex items-center">
             <button
               className={`rounded-xl border ${
                 filterPut ? "bg-teal-400 text-white" : ""
