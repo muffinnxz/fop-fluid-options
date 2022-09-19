@@ -57,10 +57,13 @@ export default function Card({ type, option }) {
     }
   }
   return (
-    <footer className="px-10  mx-20  py-3 border-b  bg-teal-50 grid grid-cols-4 gap-4">
+    // ${type == "call" ? "bg-teal-50" : "bg-red-50"}
+    <footer
+      className={`px-10  mx-20  py-3 border-b  
+      grid grid-cols-4 gap-4`}
+    >
       <div className="pl-8 col-span-2">{name}</div>
 
-      {/* <div ></div> */}
       <div className="-ml-16 flex flex-row justify-start gap-12">
         <h1 className=" w-20">{strike}</h1>
         <h1 className="w-20">{expiry}</h1>
