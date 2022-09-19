@@ -9,6 +9,7 @@ import { Card } from "@nextui-org/react";
 import { Text } from "@nextui-org/react";
 import { Container, Row, Col } from "@nextui-org/react";
 import DropDownList from "../components/DropDownList";
+import h2d from "../utils/h2d";
 
 const OptionType = {
   CALL: "call",
@@ -211,6 +212,9 @@ export default function CreateOption() {
               clearable
               placeholder="underlyamount"
               type="number"
+              min="0"
+              value="0"
+              step="any"
               required
             ></Input>
 
@@ -223,6 +227,9 @@ export default function CreateOption() {
               clearable
               placeholder="strike price"
               type="number"
+              min="0"
+              value="0"
+              step="any"
               required
             ></Input>
             <Input

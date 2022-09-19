@@ -4,6 +4,7 @@ import TradeableCallOption from "../../contracts/artifacts/contracts/TradeableCa
 import { ethers } from "ethers";
 import h2d from "../utils/h2d";
 import makeBlockie from "ethereum-blockies-base64";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 
 const Web3 = require("web3");
 
@@ -47,7 +48,8 @@ export default function Card({ type, option }) {
         });
         contract._strikePrice().then((data) => {
           let price = h2d(data._hex);
-          setStrike(price / 10 ** 18); // TODO: FIX TO IT's DECIMAL // FIX TO PUT
+          console.log(formatUnits(price, 18));
+          setStrike(formatUnits(price, 18)); // TODO: FIX TO IT's DECIMAL // FIX TO PUT
         });
       } catch (err) {
         console.log("Error: ", err);
