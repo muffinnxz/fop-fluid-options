@@ -6,6 +6,7 @@ import Web3 from "web3";
 
 import Call from "../components/Call";
 import Card from "../components/Card";
+import PaginatedItems from "../components/Pagination";
 
 export default function Home() {
   const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
@@ -14,12 +15,11 @@ export default function Home() {
   const dai = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
 
   const [filterCall, setFilterCall] = useState(true);
-  const [filterPut, setFilterPut] = useState(true);
+  const [filterPut, setFilterPut] = useState(false);
 
   return (
     <div className={styles.container}>
       <h1 className="font-bold text-2xl  mx-24 px-4 mt-6">Marketplace</h1>
-
       <div className="ml-28 mt-2 gap-2 py-8 flex flex-row w-64">
         Filter by:
         <div className="border px-1  py-1 -mt-1 gap-1 rounded-md flex flex-row">
@@ -29,7 +29,10 @@ export default function Home() {
                 filterCall ? "bg-teal-400 text-white" : ""
               }
               px-4 `}
-              onClick={(e) => setFilterCall(!filterCall)}
+              onClick={(e) => {
+                setFilterCall(!filterCall);
+                setFilterPut(!filterPut);
+              }}
             >
               Call
             </button>
@@ -40,14 +43,16 @@ export default function Home() {
                 filterPut ? "bg-teal-400 text-white" : ""
               }
               px-4 `}
-              onClick={(e) => setFilterPut(!filterPut)}
+              onClick={(e) => {
+                setFilterPut(!filterPut);
+                setFilterCall(!filterCall);
+              }}
             >
               Put
             </button>
           </div>
         </div>
       </div>
-
       <section>
         <div className="px-5 pt-4 -mt-4 mx-20  py-3 border-b   grid grid-cols-4 gap-4">
           <div className="pl-8 col-span-2">Name</div>
@@ -66,7 +71,7 @@ export default function Home() {
             <h1 className="-ml-12 w-32">Owner</h1>
           </div>
         </div>
-        {filterCall ? <Call /> : <div></div>}
+        {filterCall ? <PaginatedItems itemsPerPage={6} /> : <div></div>}
         {/* {filterPut ? <Put /> : <div></div>} TODO Wait for Put*/}
       </section>
     </div>
