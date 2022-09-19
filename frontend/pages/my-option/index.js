@@ -1,7 +1,7 @@
 import Call from "../../components/Call";
 import CreateOption from "../../components/CreateOption";
 import MyCall from "../../components/MyCall";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 export default function User() {
   const [filterCall, setFilterCall] = useState(false);
   const [filterPut, setFilterPut] = useState(false);
