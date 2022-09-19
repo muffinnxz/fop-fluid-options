@@ -57,21 +57,24 @@ export default function Card({ type, option }) {
     }
   }
   return (
-    <footer className="px-10  mx-20  py-3 border rounded-lg bg-teal-50 grid grid-cols-4 gap-4">
+    // ${type == "call" ? "bg-teal-50" : "bg-red-50"}
+    <footer
+      className={`px-10  mx-20  py-3 border-b  
+      grid grid-cols-4 gap-4`}
+    >
       <div className="pl-8 col-span-2">{name}</div>
 
-      {/* <div ></div> */}
       <div className="-ml-16 flex flex-row justify-start gap-12">
         <h1 className=" w-20">{strike}</h1>
         <h1 className="w-20">{expiry}</h1>
 
         <div
-          className={`border px-1 rounded-md justify-self-center ${
+          className={`border px-3 h-5 rounded-xl mt-1 justify-self-center ${
             type == "call" ? "bg-green-200" : "bg-red-200"
           }
           ${type == "call" ? "text-green-800" : "text-red-800"}`}
         >
-          {type == "call" ? "Call" : "Put"}
+          <h1 className="-mt-1">{type == "call" ? "Call" : "Put"}</h1>
         </div>
       </div>
 

@@ -40,8 +40,6 @@ export default function MyCall() {
   }
   return (
     <div>
-      {" "}
-      Call
       {callOptions.map((co, index) => {
         return (
           <div key={index}>
