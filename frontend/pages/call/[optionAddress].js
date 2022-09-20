@@ -83,10 +83,11 @@ export default function User() {
         contract._expirationDate(),
         contract.optionReady(),
         contract.optionActive(),
+        contract.name()
       ]).then((values) => {
         const optionData = {
           address: address,
-          reciever: values[0],
+          receiver: values[0],
           underlyingAsset: values[1],
           underlyingAmount: values[2],
           purchasingAsset: values[3],
@@ -97,6 +98,7 @@ export default function User() {
           expirationDate: values[8],
           optionReady: values[9],
           optionActive: values[10],
+          name: values[11]
         };
         console.log("Option Data", optionData);
         setOptionData(optionData);
@@ -319,6 +321,7 @@ export default function User() {
             value={"https://fop-fluid-options.herokuapp.com/" + router.asPath}
           />
         </div>
+        <div style={{ fontWeight: "bold", marginBottom: "10px"}}>{optionData.name}</div>
         <div>
           address : {optionData.address}
           <IconButton
@@ -326,6 +329,21 @@ export default function User() {
             onClick={() => {
               window.open(
                 `https://goerli.etherscan.io/address/${optionData.address}`,
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </div>
+        <div>
+          owner : {optionData.receiver}
+          <IconButton
+            aria-label="Check in etherscan"
+            onClick={() => {
+              window.open(
+                `https://goerli.etherscan.io/address/${optionData.receiver}`,
                 "_blank",
                 "noopener,noreferrer"
               );
