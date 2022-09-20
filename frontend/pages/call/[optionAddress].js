@@ -513,7 +513,9 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 {isConnected ? (
-                    isLoading || !flowRateInfo || !underlyingAllowance ? (
+                    isLoading ||
+                    !underlyingAllowance ||
+                    !flowRateInfo ? (
                         <Blocks
                             visible={true}
                             height="80"
