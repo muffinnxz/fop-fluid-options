@@ -13,7 +13,7 @@ import {
     goerliTokenDecimal,
     goerliTokenName,
 } from "../../datas/AddressDictionary";
-import { Button, IconButton } from "@mui/material";
+import { Button, IconButton, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function User() {
@@ -284,7 +284,7 @@ export default function User() {
         }
     };
 
-    if (!optionData) {
+    if (!optionData || !flowRateInfo) {
         return (
             <div className={styles.option_detail_page}>
                 <div className={styles.option_detail_header}>
@@ -396,18 +396,26 @@ export default function User() {
                 </div>
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>
-                        Premium ({goerliTokenName[optionData.flowAsset]} /
-                        day)
+                        Premium ({goerliTokenName[optionData.flowAsset]} / day)
                     </div>
-                    <div className={styles.option_detail_card_value}>
-                        {(
+                    <Tooltip
+                        title={(
                             (optionData.requiredFlowRate /
                                 goerliTokenDecimal[optionData.flowAsset]) *
                             86400
-                        )
-                            .toFixed(6)
-                            .toString()}
-                    </div>
+                        ).toString()}
+                        arrow
+                    >
+                        <div className={styles.option_detail_card_value}>
+                            {(
+                                (optionData.requiredFlowRate /
+                                    goerliTokenDecimal[optionData.flowAsset]) *
+                                86400
+                            )
+                                .toFixed(6)
+                                .toString()}
+                        </div>
+                    </Tooltip>
                 </div>
             </div>
             <div
@@ -418,42 +426,70 @@ export default function User() {
                     <div className={styles.option_detail_card_title}>
                         Collateral Amount
                     </div>
-                    <div className={styles.option_detail_card_value}>
-                        {(
+                    <Tooltip
+                        title={(
                             optionData.underlyingAmount /
                             goerliTokenDecimal[optionData.underlyingAsset]
-                        )
-                            .toFixed(6)
-                            .toString()}
-                    </div>
+                        ).toString()}
+                        arrow
+                    >
+                        <div className={styles.option_detail_card_value}>
+                            {(
+                                optionData.underlyingAmount /
+                                goerliTokenDecimal[optionData.underlyingAsset]
+                            )
+                                .toFixed(6)
+                                .toString()}
+                        </div>
+                    </Tooltip>
                 </div>
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>
                         Strike Price
                     </div>
-                    <div className={styles.option_detail_card_value}>
-                        {(
+                    <Tooltip
+                        title={(
                             optionData.purchasingAmount /
                             goerliTokenDecimal[optionData.purchasingAsset] /
                             (optionData.underlyingAmount /
                                 goerliTokenDecimal[optionData.underlyingAsset])
-                        )
-                            .toFixed(6)
-                            .toString()}
-                    </div>
+                        ).toString()}
+                        arrow
+                    >
+                        <div className={styles.option_detail_card_value}>
+                            {(
+                                optionData.purchasingAmount /
+                                goerliTokenDecimal[optionData.purchasingAsset] /
+                                (optionData.underlyingAmount /
+                                    goerliTokenDecimal[
+                                        optionData.underlyingAsset
+                                    ])
+                            )
+                                .toFixed(6)
+                                .toString()}
+                        </div>
+                    </Tooltip>
                 </div>
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>
                         Purchasing Amount
                     </div>
-                    <div className={styles.option_detail_card_value}>
-                        {(
+                    <Tooltip
+                        title={(
                             optionData.purchasingAmount /
                             goerliTokenDecimal[optionData.purchasingAsset]
-                        )
-                            .toFixed(6)
-                            .toString()}
-                    </div>
+                        ).toString()}
+                        arrow
+                    >
+                        <div className={styles.option_detail_card_value}>
+                            {(
+                                optionData.purchasingAmount /
+                                goerliTokenDecimal[optionData.purchasingAsset]
+                            )
+                                .toFixed(6)
+                                .toString()}
+                        </div>
+                    </Tooltip>
                 </div>
                 <div className={styles.option_detail_card}>
                     <div className={styles.option_detail_card_title}>

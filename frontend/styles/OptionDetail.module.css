@@ -35,6 +35,7 @@
     flex-direction: column;
     border-left: 7px solid aquamarine;
     border-radius: 7px;
+    cursor: pointer;
 }
 
 .option_detail_card_title {
