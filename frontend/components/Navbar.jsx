@@ -8,7 +8,7 @@ export default function Navbar() {
       <div className="flex flex-row gap-x-16">
         <h1
           onClick={() => router.push(`/`)}
-          className="ml-10 hover:text-white text-3xl font-medium "
+          className="ml-10 hover:text-white text-3xl font-medium cursor-pointer"
         >
           💦 Fluid Options
         </h1>
