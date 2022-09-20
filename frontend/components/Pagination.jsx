@@ -79,7 +79,7 @@ export default function PaginatedItems({ itemsPerPage }) {
         onPageChange={handlePageClick}
         pageRangeDisplayed={5}
         pageCount={pageCount}
-        previousLabel="< previous"
+        previousLabel="< prev"
         renderOnZeroPageCount={null}
       />
       {/* <button onClick={(e) => console.log(currentItems)}>Get</button> */}
