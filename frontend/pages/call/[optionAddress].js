@@ -53,10 +53,11 @@ export default function User() {
         );
         try {
             let underlyingAllowance = await link.allowance(
-                optionData.reciever,
+                optionData.receiver,
                 router.query.optionAddress
             );
             setUnderlyingAllowance(underlyingAllowance);
+            console.log(underlyingAllowance);
         } catch (err) {
             console.log("Error: ", err);
         }
@@ -284,7 +285,7 @@ export default function User() {
         }
     };
 
-    if (!optionData || !flowRateInfo) {
+    if (!optionData) {
         return (
             <div className={styles.option_detail_page}>
                 <div className={styles.option_detail_header}>
@@ -512,10 +513,7 @@ export default function User() {
                 style={{ marginTop: "20px" }}
             >
                 {isConnected ? (
-                    isLoading ||
-                    !optionData ||
-                    !underlyingAllowance ||
-                    !flowRateInfo ? (
+                    isLoading || !flowRateInfo || !underlyingAllowance ? (
                         <Blocks
                             visible={true}
                             height="80"
@@ -526,7 +524,7 @@ export default function User() {
                         />
                     ) : optionData.optionReady ? (
                         <div style={{ minWidth: "60%" }}>
-                            {optionData.reciever === address ? (
+                            {optionData.receiver === address ? (
                                 underlyingAllowance >=
                                     optionData.underlyingAmount ||
                                 optionData.optionActive ? (
