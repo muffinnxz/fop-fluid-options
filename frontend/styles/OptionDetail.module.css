@@ -26,8 +26,8 @@
 }
 
 .option_detail_card {
-    width: 160px;
-    height: 80px;
+    width: 240px;
+    height: 120px;
     padding: 10px;
     background-color: white;
     box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.4);
@@ -35,14 +35,14 @@
     flex-direction: column;
     border-left: 7px solid aquamarine;
     border-radius: 7px;
+    cursor: pointer;
 }
 
 .option_detail_card_title {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 20px;
 }
 
 .option_detail_card_value {
-    font-size: 12;
+    font-size: 42px;
+    font-weight: bold;
 }
