@@ -53,7 +53,7 @@ export default function User() {
         );
         try {
             let underlyingAllowance = await link.allowance(
-                optionData.reciever,
+                optionData.receiver,
                 router.query.optionAddress
             );
             setUnderlyingAllowance(underlyingAllowance);
@@ -513,7 +513,6 @@ export default function User() {
             >
                 {isConnected ? (
                     isLoading ||
-                    !optionData ||
                     !underlyingAllowance ||
                     !flowRateInfo ? (
                         <Blocks
@@ -526,7 +525,7 @@ export default function User() {
                         />
                     ) : optionData.optionReady ? (
                         <div style={{ minWidth: "60%" }}>
-                            {optionData.reciever === address ? (
+                            {optionData.receiver === address ? (
                                 underlyingAllowance >=
                                     optionData.underlyingAmount ||
                                 optionData.optionActive ? (
