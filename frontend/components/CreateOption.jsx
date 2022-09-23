@@ -164,7 +164,7 @@ export default function CreateOption() {
                           selectToken.value.decimal,
                           String(selectToken.pricefeed.address),
                           selectToken.pricefeed.decimal,
-                          parseInt(e.target[7].value / 86400 * 1e18),
+                          parseInt((e.target[7].value / 86400) * 1e18),
                           getTime(e.target[9].value),
                           ethers.utils.parseEther(e.target[5].value)._hex
                           // web3.utils.toWei(e.target[2].value, "ether") // TODO might change if decimal is not 18 but this case is dai
@@ -241,7 +241,11 @@ export default function CreateOption() {
                         />
                         <Input
                             clearable
-                            placeholder="Strike Price (fDai)"
+                            placeholder={
+                                optionType === OptionType.CALL
+                                    ? "Purchasing Amount (fDai)"
+                                    : "Collateral Amount (fDai)"
+                            }
                             type="number"
                             min="0"
                             value=""
@@ -261,7 +265,7 @@ export default function CreateOption() {
                             required
                         ></Input>
                         <div></div>
-                        <Button type="submit">create option</Button>
+                        <Button type="submit">Create Option</Button>
                     </form>
                 </Card>
             </Container>
