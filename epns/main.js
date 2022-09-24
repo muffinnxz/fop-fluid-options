@@ -143,7 +143,7 @@ async function callNotify(optionAddress) {
                                                         type: 3, // target
                                                         identityType: 2, // direct payload
                                                         notification: {
-                                                            title: `Your option "${optionData.name}" is now exercisable!`,
+                                                            title: `Your call option is now exercisable!`,
                                                             body: `Your option "${
                                                                 optionData.name
                                                             }" (${
@@ -320,7 +320,7 @@ async function putNotify(optionAddress) {
                                                     type: 3, // target
                                                     identityType: 2, // direct payload
                                                     notification: {
-                                                        title: `Your option "${optionData.name}" is now exercisable!`,
+                                                        title: `Your put option is now exercisable!`,
                                                         body: `Your option "${
                                                             optionData.name
                                                         }" (${
