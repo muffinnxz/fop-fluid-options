@@ -43,6 +43,18 @@ const underlyAssetOptions = [
       decimal: 8,
     },
   },
+  {
+    value: {
+      address: "0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa",
+      decimal: 18,
+    },
+    label: "WETH",
+    pricefeed: {
+      address: "0x0715A7794a1dc8e42615F059dD6e406A6594651A",
+      decimal: 8,
+    },
+  },
+
   // {
   //   value: {
   //     address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
