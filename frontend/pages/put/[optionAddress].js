@@ -374,7 +374,7 @@ export default function User() {
                         Underlying Asset
                     </div>
                     <div className={styles.option_detail_card_value}>
-                        {goerliTokenName[optionData.underlyingAsset]}
+                        {goerliTokenName[optionData.purchasingAsset]}
                     </div>
                 </div>
                 <div className={styles.option_detail_card}>
