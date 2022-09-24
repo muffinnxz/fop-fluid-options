@@ -2,11 +2,12 @@ import Call from "../../components/Call";
 import CreateOption from "../../components/CreateOption";
 import MyCall from "../../components/MyCall";
 import { useState } from "react";
-import PaginatedItems from "../../components/CallPagination";
+import GetPaying from "../../components/GetPaying";
 import MyPut from "../../components/MyPut";
 export default function User() {
   const [filterCall, setFilterCall] = useState(true);
   const [filterPut, setFilterPut] = useState(false);
+  const [filterPay, setFilterPay] = useState(false);
 
   return (
     <div>
@@ -14,7 +15,7 @@ export default function User() {
       <section>
         <CreateOption />
       </section>
-      <div className="ml-32 mt-8 gap-2 flex flex-row w-64">
+      <div className="ml-32 mt-8 gap-2 flex flex-row w-80">
         Filter by:
         <div className="border px-1  py-1 -mt-1 gap-1 rounded-md flex flex-row">
           <div className="flex  items-center ">
@@ -23,7 +24,12 @@ export default function User() {
                 filterCall ? "bg-teal-400 text-white" : ""
               }
               px-4 `}
-              onClick={(e) => setFilterCall(!filterCall)}
+              onClick={(e) => {
+                if (!filterCall) {
+                  setFilterPay(false);
+                }
+                setFilterCall(!filterCall);
+              }}
             >
               Call
             </button>
@@ -34,13 +40,36 @@ export default function User() {
                 filterPut ? "bg-teal-400 text-white" : ""
               }
               px-4 `}
-              onClick={(e) => setFilterPut(!filterPut)}
+              onClick={(e) => {
+                if (!filterPut) {
+                  setFilterPay(false);
+                }
+                setFilterPut(!filterPut);
+              }}
             >
               Put
             </button>
           </div>
         </div>
+        <div className="ml-1 flex items-center mb-1">
+          <button
+            className={`rounded-xl border ${
+              filterPay ? "bg-red-400 text-white" : ""
+            }
+              px-4 `}
+            onClick={(e) => {
+              if (!filterPay) {
+                setFilterPut(false);
+                setFilterCall(false);
+              }
+              setFilterPay(!filterPay);
+            }}
+          >
+            Paying
+          </button>
+        </div>
       </div>
+
       <section>
         <div className="px-5 pt-4   mx-20  py-3 border-b   grid grid-cols-4 gap-4">
           <div className="pl-8 col-span-2 ml-6">Name</div>
@@ -60,6 +89,8 @@ export default function User() {
         </div>
         {filterCall ? <MyCall /> : <div></div>}
         {filterPut ? <MyPut /> : <div></div>}
+
+        {filterPay ? <GetPaying /> : <div></div>}
       </section>
     </div>
   );
