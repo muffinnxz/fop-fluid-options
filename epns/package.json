@@ -11,6 +11,7 @@
     "dependencies": {
         "@chainlink/contracts": "^0.4.1",
         "@epnsproject/sdk-restapi": "^0.1.13",
+        "@superfluid-finance/sdk-core": "^0.5.6",
         "dotenv": "^16.0.2"
     },
     "devDependencies": {
