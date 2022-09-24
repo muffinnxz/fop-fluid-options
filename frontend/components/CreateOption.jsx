@@ -180,13 +180,13 @@ export default function CreateOption() {
               fDAIx,
               dai,
               String(selectToken.value.address),
-              ethers.utils.parseEther(String(underlyingAmount))._hex,
+              ethers.utils.parseEther(String(purchasingAmount))._hex,
               selectToken.value.decimal,
               String(selectToken.pricefeed.address),
               selectToken.pricefeed.decimal,
               parseInt((requiredFlowRate * 10 ** 18) / 86400),
               getTime(expiryDate),
-              ethers.utils.parseEther(String(purchasingAmount))._hex
+              ethers.utils.parseEther(String(underlyingAmount))._hex
             );
         // const data = await contract.mintCallOption(
         //   addr,
@@ -222,9 +222,7 @@ export default function CreateOption() {
           <div className={styles.option_detail_card_value}>
             {!underlyingAmount || !purchasingAmount
               ? "-"
-              : optionType === OptionType.CALL
-              ? (purchasingAmount / underlyingAmount).toFixed(6)
-              : (underlyingAmount / purchasingAmount).toFixed(6)}
+              : (purchasingAmount / underlyingAmount).toFixed(6)}
           </div>
         </div>
         <div className={styles.option_detail_card} style={{ width: "350px" }}>
