@@ -23,7 +23,7 @@ async function requestAccount() {
 const underlyAssetOptions = [
   // {
   //     value: {
-  //         address: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
+  //         address: "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7",
   //         decimal: 18,
   //     },
   //     label: "fDAI",
@@ -34,12 +34,12 @@ const underlyAssetOptions = [
   // },
   {
     value: {
-      address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+      address: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
       decimal: 18,
     },
-    label: "LINK",
+    label: "wMATIC",
     pricefeed: {
-      address: "0x48731cF7e84dc94C5f84577882c14Be11a5B7456",
+      address: "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada",
       decimal: 8,
     },
   },
@@ -52,10 +52,10 @@ const underlyAssetOptions = [
   // },
 ];
 
-const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
-const PutFactoryAddress = "0x264569c1325C26e41832dE6C8D978d59fCb05D60";
-const fDAIx = "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00";
-const dai = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
+const CallFactoryAddress = "0xb5fd8b23C8085d3d767d3817e89F111d320de151";
+const PutFactoryAddress = "0x2C231969fd81f9AF0Dfda4fd4E5088948438e230";
+const fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
+const dai = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
 
 export default function CreateOption() {
   const [optionType, setOptionType] = useState(OptionType.CALL);
@@ -101,6 +101,7 @@ export default function CreateOption() {
 
   async function mintOption(e) {
     e.preventDefault();
+    console.log("wtf");
     let type = optionType == "call" ? "CALL" : "PUT";
     let date = String(new Date(expiryDate));
     let format_date =
@@ -108,7 +109,7 @@ export default function CreateOption() {
     let name =
       type +
       "-" +
-      String(parseInt(purchasingAmount) / parseInt(underlyingAmount)) +
+      String((purchasingAmount / underlyingAmount).toFixed(2)) +
       "-" +
       "[" +
       selectToken.label +
@@ -149,15 +150,22 @@ export default function CreateOption() {
           // check date should be in future
           throw "Date must be in the future";
         }
-        if (
-          optionType == "call" &&
-          String(purchasingAmount) < String(underlyingAmount)
-        ) {
-          // check call & strike price more than underlying
-          throw "strike price must be more than underlying";
-        }
-        let addr = await signer.getAddress();
 
+        let addr = await signer.getAddress();
+        console.log(
+          addr,
+          name,
+          fDAIx, //TODO: change if we have other option
+          dai, ////TODO: change if we have other option
+          String(selectToken.value.address),
+          ethers.utils.parseEther(String(underlyingAmount))._hex, // TODO might change if decimal is not 18 but this case is link
+          selectToken.value.decimal,
+          String(selectToken.pricefeed.address),
+          selectToken.pricefeed.decimal,
+          parseInt((requiredFlowRate * 10 ** 18) / 86400),
+          getTime(expiryDate),
+          ethers.utils.parseEther(String(purchasingAmount))._hex
+        );
         optionType == "call"
           ? await contract.mintCallOption(
               addr,
@@ -309,9 +317,7 @@ export default function CreateOption() {
               required
             ></Input>
             <div></div>
-            <Button type="submit" disabled={!isConnected}>
-              Create Option
-            </Button>
+            <Button type="submit">Create Option</Button>
           </form>
         </Card>
       </Container>

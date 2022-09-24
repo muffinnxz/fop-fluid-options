@@ -1,8 +1,8 @@
 //rinkeby addresses - change if using a different network
 const host = "0xeD5B5b32110c3Ded02a07c8b8e97513FAfb883B6";
 const cfa = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
-const fDAIx = "0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90";
-const dai = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
+const fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
+const dai = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
 
 //your address here...
 const owner = "0x5966aa11c794893774a382d9a19743B8be6BFFd1";
