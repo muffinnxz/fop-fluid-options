@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
 import { useState } from "react";
 import Web3 from "web3";
+import { toast } from "react-hot-toast";
 
 import Call from "../components/Call";
 import Card from "../components/Card";
@@ -55,7 +56,23 @@ export default function Home() {
       </div>
       <section>
         <div className="px-5 pt-4 -mt-4 mx-20  py-3 border-b   grid grid-cols-4 gap-4">
-          <div className="pl-8 col-span-2">Name</div>
+          <div className="pl-8 col-span-2 flex">
+            Name{" "}
+            <button
+              className="pl-1"
+              onClick={() =>
+                toast(
+                  "Name format: 'type'-'strike_price'-[underlying_asset/purchasing_asset]-[underlying_amount/purchasing_amount]-streaming_token-expiration_date",
+                  {
+                    duration: 10000,
+                  }
+                )
+              }
+            >
+              {" "}
+              ℹ️{" "}
+            </button>
+          </div>
 
           {/* <div ></div> */}
           <div className="-ml-16 flex flex-row justify-start gap-12">
