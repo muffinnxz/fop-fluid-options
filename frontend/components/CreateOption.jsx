@@ -1,15 +1,15 @@
-import styles from "../styles/Home.module.css";
 import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json";
+import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
 import { useState } from "react";
 import { ethers } from "ethers";
+import styles from "../styles/OptionDetail.module.css";
 
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Card } from "@nextui-org/react";
-import { Text } from "@nextui-org/react";
-import { Container, Row, Col } from "@nextui-org/react";
+import { Container } from "@nextui-org/react";
 import DropDownList from "../components/DropDownList";
-import h2d from "../utils/h2d";
+import { useAccount } from "wagmi";
 
 const OptionType = {
   CALL: "call",
@@ -21,17 +21,17 @@ async function requestAccount() {
 }
 
 const underlyAssetOptions = [
-  {
-    value: {
-      address: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
-      decimal: 18,
-    },
-    label: "fDAI",
-    pricefeed: {
-      address: "0x0d79df66BE487753B02D015Fb622DED7f0E9798d",
-      decimal: 8,
-    },
-  },
+  // {
+  //     value: {
+  //         address: "0x88271d333C72e51516B67f5567c728E702b3eeE8",
+  //         decimal: 18,
+  //     },
+  //     label: "fDAI",
+  //     pricefeed: {
+  //         address: "0x0d79df66BE487753B02D015Fb622DED7f0E9798d",
+  //         decimal: 8,
+  //     },
+  // },
   {
     value: {
       address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
@@ -60,6 +60,11 @@ const dai = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
 export default function CreateOption() {
   const [optionType, setOptionType] = useState(OptionType.CALL);
   const [selectToken, setSelectToken] = useState();
+  const { isConnected } = useAccount();
+  const [underlyingAmount, setUnderlyingAmount] = useState();
+  const [purchasingAmount, setPurchasingAmount] = useState();
+  const [requiredFlowRate, setRequiredFlowRate] = useState();
+  const [expiryDate, setExpiryDate] = useState();
 
   const handleFieldChange = (_token) => {
     setSelectToken(_token);
@@ -69,6 +74,11 @@ export default function CreateOption() {
     val = new Date(val);
     return val.getTime() / 1000.0;
   }
+
+  const getCurrentTimeStamp = () => {
+    let val = new Date();
+    return val.getTime() / 1000.0;
+  };
 
   const OptionTypeGroup = () => {
     return (
@@ -92,13 +102,13 @@ export default function CreateOption() {
   async function mintOption(e) {
     e.preventDefault();
     let type = optionType == "call" ? "CALL" : "PUT";
-    let date = String(new Date(e.target[9].value));
+    let date = String(new Date(expiryDate));
     let format_date =
       date.substring(8, 10) + date.substring(4, 7) + date.substring(11, 15);
     let name =
       type +
       "-" +
-      String(parseInt(e.target[5].value) / parseInt(e.target[2].value)) +
+      String(parseInt(purchasingAmount) / parseInt(underlyingAmount)) +
       "-" +
       "[" +
       selectToken.label +
@@ -107,15 +117,14 @@ export default function CreateOption() {
       "]" +
       "-" +
       "[" +
-      e.target[2].value +
+      String(underlyingAmount) +
       "/" +
-      e.target[5].value +
+      String(purchasingAmount) +
       "]" +
       "-" +
       "fDAIx" +
       "-" +
       format_date;
-    console.log(name);
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -126,25 +135,29 @@ export default function CreateOption() {
         signer
       );
       console.log(
-        ethers.utils.parseEther(e.target[2].value),
-        e.target[2].value
+        ethers.utils.parseEther(String(underlyingAmount))._hex,
+        underlyingAmount
       );
       console.log(
-        ethers.utils.parseEther(e.target[5].value),
-        e.target[5].value
+        ethers.utils.parseEther(String(purchasingAmount))._hex,
+        purchasingAmount
       );
 
       try {
         let now = new Date().toJSON().slice(0, 10);
-        if (e.target[9].value < now) {
+        if (expiryDate < now) {
           // check date should be in future
           throw "Date must be in the future";
         }
-        if (optionType == "call" && e.target[5].value < e.target[2].value) {
+        if (
+          optionType == "call" &&
+          String(purchasingAmount) < String(underlyingAmount)
+        ) {
           // check call & strike price more than underlying
           throw "strike price must be more than underlying";
         }
         let addr = await signer.getAddress();
+
         optionType == "call"
           ? await contract.mintCallOption(
               addr,
@@ -152,28 +165,28 @@ export default function CreateOption() {
               fDAIx, //TODO: change if we have other option
               dai, ////TODO: change if we have other option
               String(selectToken.value.address),
-              ethers.utils.parseEther(e.target[2].value)._hex, // TODO might change if decimal is not 18 but this case is link
+              ethers.utils.parseEther(String(underlyingAmount))._hex, // TODO might change if decimal is not 18 but this case is link
               selectToken.value.decimal,
               String(selectToken.pricefeed.address),
               selectToken.pricefeed.decimal,
-              e.target[7].value,
-              getTime(e.target[9].value),
-              ethers.utils.parseEther(e.target[5].value)._hex
+              parseInt((requiredFlowRate * 10 ** 18) / 86400),
+              getTime(expiryDate),
+              ethers.utils.parseEther(String(purchasingAmount))._hex
               // web3.utils.toWei(e.target[2].value, "ether") // TODO might change if decimal is not 18 but this case is dai
             )
           : await contract.mintPutOption(
               addr,
-              e.target[1].value,
+              name,
               fDAIx,
               dai,
-              e.target[3].value.address,
-              e.target[2].value,
-              e.target[3].value.decimal,
-              e.target[5].value,
-              e.target[6].value,
-              e.target[7].value,
-              getTime(e.target[9].value),
-              e.target[4].value
+              String(selectToken.value.address),
+              ethers.utils.parseEther(String(purchasingAmount))._hex,
+              selectToken.value.decimal,
+              String(selectToken.pricefeed.address),
+              selectToken.pricefeed.decimal,
+              parseInt((requiredFlowRate * 10 ** 18) / 86400),
+              getTime(expiryDate),
+              ethers.utils.parseEther(String(underlyingAmount))._hex
             );
         // const data = await contract.mintCallOption(
         //   addr,
@@ -195,8 +208,37 @@ export default function CreateOption() {
       }
     }
   }
+
   return (
     <section className="flex flex-col justify-center items-center space-y-3  mx-20 mt-6">
+      <div
+        className={styles.option_detail_card_list}
+        style={{ marginTop: "25px" }}
+      >
+        <div className={styles.option_detail_card}>
+          <div className={styles.option_detail_card_title}>
+            Strike Price (fDAI)
+          </div>
+          <div className={styles.option_detail_card_value}>
+            {!underlyingAmount || !purchasingAmount
+              ? "-"
+              : (purchasingAmount / underlyingAmount).toFixed(6)}
+          </div>
+        </div>
+        <div className={styles.option_detail_card} style={{ width: "350px" }}>
+          <div className={styles.option_detail_card_title}>
+            Estimate Life-time Premium (fDAIx)
+          </div>
+          <div className={styles.option_detail_card_value}>
+            {!requiredFlowRate || !expiryDate
+              ? "-"
+              : (
+                  (requiredFlowRate / 86400) *
+                  (getTime(expiryDate) - getCurrentTimeStamp())
+                ).toFixed(8)}
+          </div>
+        </div>
+      </div>
       <Container>
         <Card css={{ padding: "$4 $4" }}>
           <form
@@ -206,45 +248,70 @@ export default function CreateOption() {
             <div className="flex justify-start ml-16 mt-3">
               <OptionTypeGroup></OptionTypeGroup>
             </div>
-
             <Input
               clearable
-              placeholder="underlyamount"
+              placeholder="Underlying Amount"
               type="number"
               min="0"
-              value="0"
+              value={underlyingAmount}
+              onChange={(e) => {
+                e.preventDefault();
+                setUnderlyingAmount(parseFloat(e.target.value));
+              }}
               step="any"
               required
             ></Input>
-
             <DropDownList
               onChangeF={handleFieldChange}
               options={underlyAssetOptions}
-              placeholder="underlyasset"
+              placeholder="Underlying Asset"
+              required
             />
             <Input
               clearable
-              placeholder="strike price"
+              placeholder={
+                optionType === OptionType.CALL
+                  ? "Purchasing Amount (fDai)"
+                  : "Collateral Amount (fDai)"
+              }
               type="number"
               min="0"
-              value="0"
+              value={purchasingAmount}
+              onChange={(e) => {
+                e.preventDefault();
+                setPurchasingAmount(parseFloat(e.target.value));
+              }}
               step="any"
               required
             ></Input>
             <Input
               clearable
-              placeholder="flow rate per sec"
+              placeholder="Premium (fDaix/Day)"
               type="number"
+              min="0"
+              value={requiredFlowRate}
+              onChange={(e) => {
+                e.preventDefault();
+                setRequiredFlowRate(parseFloat(e.target.value));
+              }}
+              step="any"
               required
             ></Input>
             <Input
               clearable
               placeholder="expiration"
               type="date"
+              value={expiryDate}
+              onChange={(e) => {
+                e.preventDefault();
+                setExpiryDate(e.target.value);
+              }}
               required
             ></Input>
             <div></div>
-            <Button type="submit">create option</Button>
+            <Button type="submit" disabled={!isConnected}>
+              Create Option
+            </Button>
           </form>
         </Card>
       </Container>

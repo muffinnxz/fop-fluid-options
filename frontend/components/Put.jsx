@@ -3,17 +3,16 @@ import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import Card from "./Card";
-import PaginatedItems from "./CallPagination";
 
-export default function Call({ currentItems }) {
+export default function Put({ currentItems }) {
   return (
     <div>
       {currentItems &&
         currentItems.map((co, index) => {
           return (
             <div>
-              <a href={`/call/${co}`}>
-                <Card type="call" option={co} />
+              <a href={`/put/${co}`}>
+                <Card type="put" option={co} />
                 {/* {co} */}
               </a>
             </div>

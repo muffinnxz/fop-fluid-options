@@ -125,10 +125,9 @@ export default function User() {
         );
 
         try {
-            const underlyingAmount = await contract._underlyingAmount();
             let tx = await link.approve(
                 router.query.optionAddress,
-                underlyingAmount
+                optionData.underlyingAmount
             );
             await tx.wait();
             await checkUserUnderlyingAllowance();
@@ -265,15 +264,14 @@ export default function User() {
             signer
         );
         const fDAI = new ethers.Contract(
-            "0x88271d333C72e51516B67f5567c728E702b3eeE8",
+            optionData.purchasingAsset,
             fDAIToken.result,
             signer
         );
         try {
-            const strikePrice = await contract._strikePrice();
             let tx = await fDAI.approve(
                 router.query.optionAddress,
-                strikePrice
+                optionData.purchasingAmount
             );
             await tx.wait();
             let tx2 = await contract.exerciseOption();

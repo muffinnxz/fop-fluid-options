@@ -3,10 +3,13 @@ import { ethers } from "ethers";
 import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
 import { useState } from "react";
 import Web3 from "web3";
+import { toast } from "react-hot-toast";
 
 import Call from "../components/Call";
 import Card from "../components/Card";
-import PaginatedItems from "../components/Pagination";
+import PaginatedItems from "../components/CallPagination";
+import PaginatedCallItems from "../components/CallPagination";
+import PaginatedPutItems from "../components/PutPagination";
 
 export default function Home() {
   const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
@@ -55,14 +58,30 @@ export default function Home() {
       </div>
       <section>
         <div className="px-5 pt-4 -mt-4 mx-20  py-3 border-b   grid grid-cols-4 gap-4">
-          <div className="pl-8 col-span-2">Name</div>
+          <div className="pl-8 ml-6 col-span-2 flex">
+            Name{" "}
+            <button
+              className="pl-1"
+              onClick={() =>
+                toast(
+                  "Name format: 'type'-'strike_price'-[underlying_asset/purchasing_asset]-[underlying_amount/purchasing_amount]-streaming_token-expiration_date",
+                  {
+                    duration: 10000,
+                  }
+                )
+              }
+            >
+              {" "}
+              ℹ️{" "}
+            </button>
+          </div>
 
           {/* <div ></div> */}
           <div className="-ml-16 flex flex-row justify-start gap-12">
             <h1 className="-ml-2 w-20">Strike</h1>
-            <h1 className="ml-6 w-20">Expiry</h1>
+            <h1 className="ml-7 w-25">Expiry</h1>
 
-            <div className={`-ml-3 px-1 rounded-md justify-self-center `}>
+            <div className={`ml-12 px-1 rounded-md justify-self-center `}>
               Type
             </div>
           </div>
@@ -71,8 +90,8 @@ export default function Home() {
             <h1 className="-ml-12 w-32">Owner</h1>
           </div>
         </div>
-        {filterCall ? <PaginatedItems itemsPerPage={6} /> : <div></div>}
-        {/* {filterPut ? <Put /> : <div></div>} TODO Wait for Put*/}
+        {filterCall ? <PaginatedCallItems itemsPerPage={6} /> : <div></div>}
+        {filterPut ? <PaginatedPutItems itemsPerPage={6} /> : <div></div>}
       </section>
     </div>
   );

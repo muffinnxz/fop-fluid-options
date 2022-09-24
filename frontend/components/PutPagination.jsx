@@ -2,17 +2,16 @@ import { ClassNames } from "@emotion/react";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { ethers } from "ethers";
-import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json";
-import Card from "./Card";
-import Call from "./Call";
+import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
+import Put from "./Put";
 
 // Example items, to simulate fetching from another resources.
 
 function Items({ currentItems }) {
-  return <Call currentItems={currentItems} />;
+  return <Put currentItems={currentItems} />;
 }
 
-export default function PaginatedItems({ itemsPerPage }) {
+export default function PaginatedPutItems({ itemsPerPage }) {
   const [items, setItems] = useState([]);
   // We start with an empty list of items.
   const [currentItems, setCurrentItems] = useState(null);
@@ -22,7 +21,7 @@ export default function PaginatedItems({ itemsPerPage }) {
   const [itemOffset, setItemOffset] = useState(0);
 
   useEffect(() => {
-    getAllCallOption();
+    getAllPutOption();
   }, []);
 
   useEffect(() => {
@@ -42,22 +41,22 @@ export default function PaginatedItems({ itemsPerPage }) {
     setItemOffset(newOffset);
   };
 
-  const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
+  const PutFactoryAddress = "0x264569c1325C26e41832dE6C8D978d59fCb05D60";
 
-  async function getAllCallOption() {
+  async function getAllPutOption() {
     if (typeof window.ethereum !== "undefined") {
       const provider = ethers.getDefaultProvider("goerli");
       const contract = new ethers.Contract(
-        CallFactoryAddress,
-        OptionFactory.abi,
+        PutFactoryAddress,
+        OptionPutFactory.abi,
         provider
       );
       try {
-        contract.getCallOptions().then(([...data]) => {
+        contract.getPutOptions().then(([...data]) => {
           console.log(data.reverse());
           //   let rev_data = data.reverse();
           setItems(data);
-          console.log("All call options equal");
+          console.log("All put options equal");
         });
       } catch (err) {
         console.log("Error: ", err);
