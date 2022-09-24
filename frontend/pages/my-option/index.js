@@ -42,15 +42,15 @@ export default function User() {
         </div>
       </div>
       <section>
-        <div className="px-5 pt-4  mx-20  py-3 border-b   grid grid-cols-4 gap-4">
-          <div className="pl-8 col-span-2">Name</div>
+        <div className="px-5 pt-4   mx-20  py-3 border-b   grid grid-cols-4 gap-4">
+          <div className="pl-8 col-span-2 ml-6">Name</div>
 
           {/* <div ></div> */}
           <div className="-ml-16 flex flex-row justify-start gap-12">
             <h1 className="-ml-2 w-20">Strike</h1>
             <h1 className="ml-6 w-20">Expiry</h1>
 
-            <div className={`-ml-3 px-1 rounded-md justify-self-center `}>
+            <div className={`ml-8 px-1 rounded-md justify-self-center `}>
               Type
             </div>
           </div>
