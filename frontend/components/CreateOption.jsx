@@ -316,11 +316,7 @@ export default function CreateOption() {
                             required
                         ></Input>
                         <div></div>
-                        {isConnected ? (
-                            <Button type="submit">Create Option</Button>
-                        ) : (
-                            <div>Please connect your wallet</div>
-                        )}
+                        <Button type="submit" disabled={!isConnected}>Create Option</Button>
                     </form>
                 </Card>
             </Container>
