@@ -625,7 +625,7 @@ export default function User() {
                                                             .toString()}
                                                     </div>
                                                 </div>
-                                                <div
+                                                {/* <div
                                                     style={{
                                                         display: "flex",
                                                         flexDirection: "row",
@@ -650,7 +650,7 @@ export default function User() {
                                                                     .flowAsset
                                                             ]}
                                                     </div>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )}
 
