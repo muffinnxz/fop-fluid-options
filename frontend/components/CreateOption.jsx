@@ -1,5 +1,6 @@
 import styles from "../styles/Home.module.css";
 import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json";
+import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
 import { useState } from "react";
 import { ethers } from "ethers";
 
@@ -163,17 +164,17 @@ export default function CreateOption() {
             )
           : await contract.mintPutOption(
               addr,
-              e.target[1].value,
+              name,
               fDAIx,
               dai,
-              e.target[3].value.address,
-              e.target[2].value,
-              e.target[3].value.decimal,
-              e.target[5].value,
-              e.target[6].value,
+              String(selectToken.value.address),
+              ethers.utils.parseEther(e.target[2].value)._hex,
+              selectToken.value.decimal,
+              String(selectToken.pricefeed.address),
+              selectToken.pricefeed.decimal,
               e.target[7].value,
               getTime(e.target[9].value),
-              e.target[4].value
+              ethers.utils.parseEther(e.target[5].value)._hex
             );
         // const data = await contract.mintCallOption(
         //   addr,
