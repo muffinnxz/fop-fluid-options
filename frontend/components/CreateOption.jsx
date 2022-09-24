@@ -1,11 +1,12 @@
 import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json";
 import { useState } from "react";
 import { ethers } from "ethers";
+import styles from "../styles/OptionDetail.module.css";
 
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Card } from "@nextui-org/react";
-import { Container} from "@nextui-org/react";
+import { Container } from "@nextui-org/react";
 import DropDownList from "../components/DropDownList";
 import { useAccount } from "wagmi";
 
@@ -59,6 +60,10 @@ export default function CreateOption() {
     const [optionType, setOptionType] = useState(OptionType.CALL);
     const [selectToken, setSelectToken] = useState();
     const { isConnected } = useAccount();
+    const [underlyingAmount, setUnderlyingAmount] = useState();
+    const [purchasingAmount, setPurchasingAmount] = useState();
+    const [requiredFlowRate, setRequiredFlowRate] = useState();
+    const [expiryDate, setExpiryDate] = useState();
 
     const handleFieldChange = (_token) => {
         setSelectToken(_token);
@@ -68,6 +73,12 @@ export default function CreateOption() {
         val = new Date(val);
         return val.getTime() / 1000.0;
     }
+
+    const getCurrentTimeStamp = () => {
+        let val = new Date();
+        return val.getTime() / 1000.0;
+    };
+    
 
     const OptionTypeGroup = () => {
         return (
@@ -200,19 +211,36 @@ export default function CreateOption() {
             }
         }
     }
+
     return (
         <section className="flex flex-col justify-center items-center space-y-3  mx-20 mt-6">
-            {/* <div
-                className={styles2.option_detail_card_list}
+            <div
+                className={styles.option_detail_card_list}
                 style={{ marginTop: "25px" }}
             >
-                <div className={styles2.option_detail_card}>
-                    <div className={styles2.option_detail_card_title}>
-                        Underlying Asset
+                <div className={styles.option_detail_card}>
+                    <div className={styles.option_detail_card_title}>
+                        Strike Price (fDAI)
                     </div>
-                    <div className={styles2.option_detail_card_value}>TEST</div>
+                    <div className={styles.option_detail_card_value}>
+                        {!underlyingAmount || !purchasingAmount
+                            ? "-"
+                            : optionType === OptionType.CALL
+                            ? (underlyingAmount / purchasingAmount).toFixed(6)
+                            : (purchasingAmount / underlyingAmount).toFixed(6)}
+                    </div>
                 </div>
-            </div> */}
+                <div className={styles.option_detail_card} style={{width: "350px"}}>
+                    <div className={styles.option_detail_card_title}>
+                        Estimate Life-time Premium (fDAIx)
+                    </div>
+                    <div className={styles.option_detail_card_value}>
+                        {!requiredFlowRate || !expiryDate
+                            ? "-"
+                            : (requiredFlowRate / 86400 * (getTime(expiryDate) - getCurrentTimeStamp())).toFixed(8) }
+                    </div>
+                </div>
+            </div>
             <Container>
                 <Card css={{ padding: "$4 $4" }}>
                     <form
@@ -227,7 +255,11 @@ export default function CreateOption() {
                             placeholder="Underlying Amount"
                             type="number"
                             min="0"
-                            value=""
+                            value={underlyingAmount}
+                            onChange={(e) => {
+                                e.preventDefault();
+                                setUnderlyingAmount(parseFloat(e.target.value));
+                            }}
                             step="any"
                             required
                         ></Input>
@@ -246,7 +278,11 @@ export default function CreateOption() {
                             }
                             type="number"
                             min="0"
-                            value=""
+                            value={purchasingAmount}
+                            onChange={(e) => {
+                                e.preventDefault();
+                                setPurchasingAmount(parseFloat(e.target.value));
+                            }}
                             step="any"
                             required
                         ></Input>
@@ -255,7 +291,11 @@ export default function CreateOption() {
                             placeholder="Premium (fDaix/Day)"
                             type="number"
                             min="0"
-                            value=""
+                            value={requiredFlowRate}
+                            onChange={(e) => {
+                                e.preventDefault();
+                                setRequiredFlowRate(parseFloat(e.target.value));
+                            }}
                             step="any"
                             required
                         ></Input>
@@ -263,10 +303,19 @@ export default function CreateOption() {
                             clearable
                             placeholder="expiration"
                             type="date"
+                            value={expiryDate}
+                            onChange={(e) => {
+                                e.preventDefault();
+                                setExpiryDate(e.target.value);
+                            }}
                             required
                         ></Input>
                         <div></div>
-                        <Button disabled={isConnected} type="submit">Create Option</Button>
+                        {isConnected ? (
+                            <Button type="submit">Create Option</Button>
+                        ) : (
+                            <div>Please connect your wallet</div>
+                        )}
                     </form>
                 </Card>
             </Container>
