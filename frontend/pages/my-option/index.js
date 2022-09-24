@@ -3,6 +3,7 @@ import CreateOption from "../../components/CreateOption";
 import MyCall from "../../components/MyCall";
 import { useState } from "react";
 import PaginatedItems from "../../components/Pagination";
+import MyPut from "../../components/MyPut";
 export default function User() {
   const [filterCall, setFilterCall] = useState(true);
   const [filterPut, setFilterPut] = useState(false);
@@ -58,7 +59,7 @@ export default function User() {
           </div>
         </div>
         {filterCall ? <MyCall /> : <div></div>}
-        {/* {filterPut ? <MyPut /> : <div></div>}  TODO waiting for Put*/}
+        {filterPut ? <MyPut /> : <div></div>}
       </section>
     </div>
   );

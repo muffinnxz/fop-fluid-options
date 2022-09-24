@@ -1,4 +1,5 @@
 import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json";
+import OptionPutFactory from "../../contracts/artifacts/contracts/OptionPutFactory.sol/OptionPutFactory.json";
 import { useState } from "react";
 import { ethers } from "ethers";
 import styles from "../styles/OptionDetail.module.css";
@@ -147,48 +148,45 @@ export default function CreateOption() {
             );
 
             try {
-                let now = new Date().toJSON().slice(0, 10);
-                if (e.target[9].value < now) {
-                    // check date should be in future
-                    throw "Date must be in the future";
-                }
-                // if (
-                //     optionType == "call" &&
-                //     e.target[5].value < e.target[2].value
-                // ) {
-                //     // check call & strike price more than underlying
-                //     throw "strike price must be more than underlying";
-                // }
-                let addr = await signer.getAddress();
-                optionType == "call"
-                    ? await contract.mintCallOption(
-                          addr,
-                          name,
-                          fDAIx, //TODO: change if we have other option
-                          dai, ////TODO: change if we have other option
-                          String(selectToken.value.address),
-                          ethers.utils.parseEther(e.target[2].value)._hex, // TODO might change if decimal is not 18 but this case is link
-                          selectToken.value.decimal,
-                          String(selectToken.pricefeed.address),
-                          selectToken.pricefeed.decimal,
-                          parseInt((e.target[7].value / 86400) * 1e18),
-                          getTime(e.target[9].value),
-                          ethers.utils.parseEther(e.target[5].value)._hex
-                          // web3.utils.toWei(e.target[2].value, "ether") // TODO might change if decimal is not 18 but this case is dai
-                      )
-                    : await contract.mintPutOption(
-                          addr,
-                          e.target[1].value,
-                          fDAIx,
-                          dai,
-                          e.target[3].value.address,
-                          e.target[2].value,
-                          e.target[3].value.decimal,
-                          e.target[5].value,
-                          e.target[6].value,
-                          e.target[7].value * 1e18,
-                          getTime(e.target[9].value),
-                          e.target[4].value
+        let now = new Date().toJSON().slice(0, 10);
+        if (e.target[9].value < now) {
+          // check date should be in future
+          throw "Date must be in the future";
+        }
+        if (optionType == "call" && e.target[5].value < e.target[2].value) {
+          // check call & strike price more than underlying
+          throw "strike price must be more than underlying";
+        }
+        let addr = await signer.getAddress();
+        optionType == "call"
+          ? await contract.mintCallOption(
+              addr,
+              name,
+              fDAIx, //TODO: change if we have other option
+              dai, ////TODO: change if we have other option
+              String(selectToken.value.address),
+              ethers.utils.parseEther(e.target[2].value)._hex, // TODO might change if decimal is not 18 but this case is link
+              selectToken.value.decimal,
+              String(selectToken.pricefeed.address),
+              selectToken.pricefeed.decimal,
+              e.target[7].value,
+              getTime(e.target[9].value),
+              ethers.utils.parseEther(e.target[5].value)._hex
+              // web3.utils.toWei(e.target[2].value, "ether") // TODO might change if decimal is not 18 but this case is dai
+            )
+          : await contract.mintPutOption(
+              addr,
+              name,
+              fDAIx,
+              dai,
+              String(selectToken.value.address),
+              ethers.utils.parseEther(e.target[2].value)._hex,
+              selectToken.value.decimal,
+              String(selectToken.pricefeed.address),
+              selectToken.pricefeed.decimal,
+              e.target[7].value,
+              getTime(e.target[9].value),
+              ethers.utils.parseEther(e.target[5].value)._hex
                       );
                 // const data = await contract.mintCallOption(
                 //   addr,
