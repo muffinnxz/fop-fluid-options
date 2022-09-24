@@ -1,5 +1,3 @@
-import styles from "../styles/Home.module.css";
-import styles2 from "../styles/OptionDetail.module.css";
 import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json";
 import { useState } from "react";
 import { ethers } from "ethers";
@@ -7,11 +5,9 @@ import { ethers } from "ethers";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Card } from "@nextui-org/react";
-import { Text } from "@nextui-org/react";
-import { Container, Row, Col } from "@nextui-org/react";
+import { Container} from "@nextui-org/react";
 import DropDownList from "../components/DropDownList";
-import h2d from "../utils/h2d";
-import { goerliTokenName } from "../datas/AddressDictionary";
+import { useAccount } from "wagmi";
 
 const OptionType = {
     CALL: "call",
@@ -62,6 +58,7 @@ const dai = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
 export default function CreateOption() {
     const [optionType, setOptionType] = useState(OptionType.CALL);
     const [selectToken, setSelectToken] = useState();
+    const { isConnected } = useAccount();
 
     const handleFieldChange = (_token) => {
         setSelectToken(_token);
@@ -238,6 +235,7 @@ export default function CreateOption() {
                             onChangeF={handleFieldChange}
                             options={underlyAssetOptions}
                             placeholder="Underlying Asset"
+                            required
                         />
                         <Input
                             clearable
@@ -256,6 +254,9 @@ export default function CreateOption() {
                             clearable
                             placeholder="Premium (fDaix/Day)"
                             type="number"
+                            min="0"
+                            value=""
+                            step="any"
                             required
                         ></Input>
                         <Input
@@ -265,7 +266,7 @@ export default function CreateOption() {
                             required
                         ></Input>
                         <div></div>
-                        <Button type="submit">Create Option</Button>
+                        <Button disabled={isConnected} type="submit">Create Option</Button>
                     </form>
                 </Card>
             </Container>

@@ -20,6 +20,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <h1 className="font-bold text-2xl  mx-24 px-4 mt-6">Marketplace</h1>
+      <h2 className="font-bold text-base  mx-24 px-4 mt-2">{"{OPTION_TYPE}-[{UNDERLYING_ASEET}/{PURCHASING_ASSET}]-[{UNDELYING_AMOUNT/{PURCHASING_AMOUNT}]-{FLOW_ASSET}-{EXPIRATIONDATE}"}</h2>
       <div className="ml-28 mt-2 gap-2 py-8 flex flex-row w-64">
         Filter by:
         <div className="border px-1  py-1 -mt-1 gap-1 rounded-md flex flex-row">
