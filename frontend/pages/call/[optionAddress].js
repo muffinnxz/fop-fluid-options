@@ -269,7 +269,7 @@ export default function User() {
     try {
       let tx = await fDAI.approve(
         router.query.optionAddress,
-        optionData.purchasingAmount
+        optionData.purchasingAmount._hex
       );
       await tx.wait();
       let tx2 = await contract.exerciseOption();
