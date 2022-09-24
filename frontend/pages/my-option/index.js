@@ -2,7 +2,7 @@ import Call from "../../components/Call";
 import CreateOption from "../../components/CreateOption";
 import MyCall from "../../components/MyCall";
 import { useState } from "react";
-import PaginatedItems from "../../components/Pagination";
+import PaginatedItems from "../../components/CallPagination";
 import MyPut from "../../components/MyPut";
 export default function User() {
   const [filterCall, setFilterCall] = useState(true);

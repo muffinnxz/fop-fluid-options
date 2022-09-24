@@ -3,7 +3,7 @@ import OptionFactory from "../../contracts/artifacts/contracts/OptionFactory.sol
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import Card from "./Card";
-import PaginatedItems from "./Pagination";
+import PaginatedItems from "./CallPagination";
 
 export default function Call({ currentItems }) {
   return (

@@ -7,7 +7,9 @@ import { toast } from "react-hot-toast";
 
 import Call from "../components/Call";
 import Card from "../components/Card";
-import PaginatedItems from "../components/Pagination";
+import PaginatedItems from "../components/CallPagination";
+import PaginatedCallItems from "../components/CallPagination";
+import PaginatedPutItems from "../components/PutPagination";
 
 export default function Home() {
   const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
@@ -88,8 +90,8 @@ export default function Home() {
             <h1 className="-ml-12 w-32">Owner</h1>
           </div>
         </div>
-        {filterCall ? <PaginatedItems itemsPerPage={6} /> : <div></div>}
-        {/* {filterPut ? <Put /> : <div></div>} TODO Wait for Put*/}
+        {filterCall ? <PaginatedCallItems itemsPerPage={6} /> : <div></div>}
+        {filterPut ? <PaginatedPutItems itemsPerPage={6} /> : <div></div>}
       </section>
     </div>
   );
