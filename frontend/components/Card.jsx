@@ -79,58 +79,72 @@ export default function Card({ type, option }) {
   }
   return (
     // ${type == "call" ? "bg-teal-50" : "bg-red-50"}
-    <footer
-      className={`px-10  mx-20  py-3 border-b  
+    <>
+      {name && (
+        <a
+          href={
+            name.substring(0, 3) == "PUT"
+              ? "put/" + String(option)
+              : "call/" + String(option)
+          }
+          className={`px-10  mx-20  py-3 border-b  
     grid grid-cols-4 gap-4`}
-    >
-      {(!strike ||
-        !name ||
-        !expiry ||
-        !owner ||
-        isActive === null ||
-        isReady === null) && (
-        <div className="col-span-4 m-auto -my-3 ">
-          <Blocks
-            visible={true}
-            height="40"
-            width="40"
-            ariaLabel="blocks-loading"
-            wrapperStyle={{}}
-            wrapperclassName="blocks-wrapper"
-          />
-        </div>
-      )}
+        >
+          {(!strike ||
+            !name ||
+            !expiry ||
+            !owner ||
+            isActive === null ||
+            isReady === null) && (
+            <div className="col-span-4 m-auto -my-3 ">
+              <Blocks
+                visible={true}
+                height="40"
+                width="40"
+                ariaLabel="blocks-loading"
+                wrapperStyle={{}}
+                wrapperclassName="blocks-wrapper"
+              />
+            </div>
+          )}
 
-      <div className="pl-8 col-span-2">{name}</div>
+          <div className="pl-8 col-span-2">{name}</div>
 
-      <div className="-ml-16 flex flex-row justify-start gap-12">
-        <Tooltip title={strike ? strike : ""} arrow>
-          <h1 className=" w-20">{strike && strike.substring(0, 8)}</h1>
-        </Tooltip>
+          <div className="-ml-16 flex flex-row justify-start gap-12">
+            <Tooltip title={strike ? strike : ""} arrow>
+              <h1 className=" w-20">{strike && strike.substring(0, 8)}</h1>
+            </Tooltip>
 
-        <h1 className="w-25 text-sm -py-1 text-center">
-          {expiry &&
-            ((!isReady && !isActive) || getTime(expiry) <= getCurrentTimeStamp()
-              ? "Option has been Expired "
-              : expiry)}
-        </h1>
+            <h1 className="w-25 text-sm -py-1 text-center">
+              {expiry &&
+                ((!isReady && !isActive) ||
+                getTime(expiry) <= getCurrentTimeStamp()
+                  ? "Option has been Expired "
+                  : expiry)}
+            </h1>
 
-        {(strike || name || expiry || owner) && (
-          <div
-            className={`border px-3 h-5 rounded-xl mt-1 justify-self-center ${
-              type == "call" ? "bg-green-200" : "bg-red-200"
-            }
-    ${type == "call" ? "text-green-800" : "text-red-800"}`}
-          >
-            <h1 className="-mt-1">{type == "call" ? "Call" : "Put"}</h1>
+            {name && (
+              <div
+                className={`border px-3 h-5 rounded-xl mt-1 justify-self-center ${
+                  name.substring(0, 3) == "PUT" ? "bg-red-200" : "bg-green-200"
+                }
+    ${name.substring(0, 3) == "PUT" ? "text-red-800" : "text-green-800"}`}
+              >
+                <h1 className="-mt-1">
+                  {name.substring(0, 3) == "PUT" ? "Put" : "Call"}
+                </h1>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="flex flex-row justify-center gap-4">
-        {owner && <img src={makeBlockie(String(owner))} className="w-8 h-8" />}
-        <h1 className="w-32">{owner}</h1>
-      </div>
-    </footer>
+          <div className="flex flex-row justify-center gap-4">
+            {owner && (
+              <img src={makeBlockie(String(owner))} className="w-8 h-8" />
+            )}
+            <h1 className="w-32">{owner}</h1>
+          </div>
+        </a>
+      )}
+    </>
   );
 }
