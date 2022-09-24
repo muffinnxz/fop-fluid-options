@@ -31,13 +31,13 @@ export default function Navbar() {
         >
           My Options
         </button>
-        {/* <button
-          className="pt-2 text-teal-700 hover:text-white  pr-8 "
-          onClick={() => router.push(`/my-option`)}
+        <button
+          type="button"
+          className="border bg-gray-100    font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+          onClick={() => router.push(`/notifications`)}
         >
-          {" "}
-          My Option{" "}
-        </button> */}
+          Notifications
+        </button>
         <ConnectWallet className="order-last " />
       </div>
     </nav>
