@@ -78,7 +78,6 @@ export default function CreateOption() {
         let val = new Date();
         return val.getTime() / 1000.0;
     };
-    
 
     const OptionTypeGroup = () => {
         return (
@@ -226,18 +225,24 @@ export default function CreateOption() {
                         {!underlyingAmount || !purchasingAmount
                             ? "-"
                             : optionType === OptionType.CALL
-                            ? (underlyingAmount / purchasingAmount).toFixed(6)
-                            : (purchasingAmount / underlyingAmount).toFixed(6)}
+                            ? (purchasingAmount / underlyingAmount).toFixed(6)
+                            : (underlyingAmount / purchasingAmount).toFixed(6)}
                     </div>
                 </div>
-                <div className={styles.option_detail_card} style={{width: "350px"}}>
+                <div
+                    className={styles.option_detail_card}
+                    style={{ width: "350px" }}
+                >
                     <div className={styles.option_detail_card_title}>
                         Estimate Life-time Premium (fDAIx)
                     </div>
                     <div className={styles.option_detail_card_value}>
                         {!requiredFlowRate || !expiryDate
                             ? "-"
-                            : (requiredFlowRate / 86400 * (getTime(expiryDate) - getCurrentTimeStamp())).toFixed(8) }
+                            : (
+                                  (requiredFlowRate / 86400) *
+                                  (getTime(expiryDate) - getCurrentTimeStamp())
+                              ).toFixed(8)}
                     </div>
                 </div>
             </div>
