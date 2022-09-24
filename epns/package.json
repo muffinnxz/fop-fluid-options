@@ -1,14 +1,21 @@
 {
-  "name": "epns",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@epnsproject/sdk-restapi": "^0.1.13"
-  }
+    "name": "epns",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@chainlink/contracts": "^0.4.1",
+        "@epnsproject/sdk-restapi": "^0.1.13",
+        "dotenv": "^16.0.2"
+    },
+    "devDependencies": {
+        "eslint": "8.21.0",
+        "eslint-config-next": "12.2.3",
+        "ethers": "^5.4.7"
+    }
 }
