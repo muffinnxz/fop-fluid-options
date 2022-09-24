@@ -3,6 +3,7 @@ import * as EpnsAPI from "@epnsproject/sdk-restapi";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import Notification from "../../components/Notification";
 
 /*
 "0x8dddb1f327113a90d6819c3a9ca574e6a81caeee"
@@ -43,6 +44,7 @@ export default function User() {
             },
             env: "staging",
         });
+        getSubscriptions();
     }
 
     async function unsubscribe() {
@@ -60,35 +62,18 @@ export default function User() {
             },
             env: "staging",
         });
-    }
-
-    async function testNotify() {
-        const PK = process.env.REACT_APP_EPNS_OWNER;
-        const Pkey = `0x${PK}`;
-        const signer = new ethers.Wallet(Pkey);
-        const apiResponse = await EpnsAPI.payloads.sendNotification({
-            signer,
-            type: 3, // target
-            identityType: 2, // direct payload
-            notification: {
-                title: `[SDK-TEST] notification TITLE:`,
-                body: `[sdk-test] notification BODY`,
-            },
-            payload: {
-                title: `[sdk-test] payload title`,
-                body: `sample msg body`,
-                cta: "",
-                img: "",
-            },
-            recipients: CAIP + address, // recipient address
-            channel: CAIP + channelAddress, // your channel address
-            env: "staging",
-        });
-        console.log(apiResponse);
+        getSubscriptions();
     }
 
     return (
-        <div>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center"
+            }}
+        >
             <h1 className="font-bold text-2xl mx-24 px-4 mt-6">
                 Notifications
             </h1>
@@ -117,14 +102,9 @@ export default function User() {
                         Subscribe
                     </Button>
                 )}
-                <Button
-                    className="mt-5"
-                    onPress={() => {
-                        testNotify();
-                    }}
-                >
-                    Test Notify
-                </Button>
+            </div>
+            <div style={{ width: "80%" }}>
+                <Notification />
             </div>
         </div>
     );
