@@ -101,7 +101,7 @@ export default function Card({ type, option }) {
             <div className="pl-8 col-span-2">{name}</div>
 
             <div className="-ml-16 flex flex-row justify-start gap-12">
-                <Tooltip title={strike} arrow>
+                <Tooltip title={strike ? strike : ""} arrow>
                     <h1 className=" w-20">
                         {strike && strike.substring(0, 8)}
                     </h1>
