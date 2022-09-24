@@ -61,9 +61,9 @@ export default function Home() {
           {/* <div ></div> */}
           <div className="-ml-16 flex flex-row justify-start gap-12">
             <h1 className="-ml-2 w-20">Strike</h1>
-            <h1 className="ml-6 w-20">Expiry</h1>
+            <h1 className="ml-6 w-25">Expiry</h1>
 
-            <div className={`-ml-3 px-1 rounded-md justify-self-center `}>
+            <div className={`ml-20 px-1 rounded-md justify-self-center `}>
               Type
             </div>
           </div>

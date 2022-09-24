@@ -15,6 +15,8 @@ export default function Card({ type, option }) {
     const [owner, setOwner] = useState(null);
     const [expiry, setExpiry] = useState(null);
     const [strike, setStrike] = useState(null);
+    const [isActive, setIsActive] = useState(null);
+    const [isReady, setIsReady] = useState(null);
 
     useEffect(() => {
         getAllInformation(option);
@@ -25,6 +27,16 @@ export default function Card({ type, option }) {
         return myDate;
     }
 
+    function getTime(val) {
+        val = new Date(val);
+        return val.getTime() / 1000.0;
+    }
+
+    const getCurrentTimeStamp = () => {
+        let val = new Date();
+        return val.getTime() / 1000.0;
+    };
+
     const web3 = new Web3(Web3.givenProvider);
 
     async function getAllInformation(optionAddress) {
@@ -32,6 +44,7 @@ export default function Card({ type, option }) {
         setOwner(null);
         setExpiry(null);
         setStrike(null);
+        setIsActive(null);
         if (typeof window.ethereum !== "undefined") {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const contract = new ethers.Contract(
@@ -52,13 +65,15 @@ export default function Card({ type, option }) {
                     setOwner(data.substring(0, 6) + "..." + data.substring(38));
                 });
                 contract._expirationDate().then((data) => {
-                    setExpiry(getDate(data).toLocaleString().substring(0, 9));
+                    setExpiry(getDate(data).toLocaleString());
                 });
                 contract._strikePrice().then((data) => {
                     let price = h2d(data._hex);
                     console.log(formatUnits(price, 18));
                     setStrike(formatUnits(price, 18)); // TODO: FIX TO IT's DECIMAL // FIX TO PUT
                 });
+                contract.optionActive().then((data) => setIsActive(data));
+                contract.optionReady().then((data) => setIsReady(data));
             } catch (err) {
                 console.log("Error: ", err);
             }
@@ -70,7 +85,7 @@ export default function Card({ type, option }) {
             className={`px-10  mx-20  py-3 border-b  
     grid grid-cols-4 gap-4`}
         >
-            {(!strike || !name || !expiry || !owner) && (
+            {(!strike || !name || !expiry || !owner || isActive === null || isReady === null) && (
                 <div className="col-span-4 m-auto -my-3 ">
                     <Blocks
                         visible={true}
@@ -92,7 +107,12 @@ export default function Card({ type, option }) {
                     </h1>
                 </Tooltip>
 
-                <h1 className="w-20">{expiry}</h1>
+                <h1 className="w-25">
+                    {expiry &&
+                        ((!isReady && !isActive) || getTime(expiry) <= getCurrentTimeStamp()
+                            ? "Expired"
+                            : expiry)}
+                </h1>
 
                 {(strike || name || expiry || owner) && (
                     <div
