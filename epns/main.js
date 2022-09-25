@@ -7,22 +7,22 @@ dotenv.config();
 
 const CAIP = "eip155:42:";
 const channelAddress = "0x8dddb1f327113a90d6819c3a9ca574e6a81caeee";
-const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
-const PutFactoryAddress = "0x264569c1325C26e41832dE6C8D978d59fCb05D60";
-const fDAI = "0x88271d333C72e51516B67f5567c728E702b3eeE8";
-const fDAIx = "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00";
+const CallFactoryAddress = "0xb5fd8b23C8085d3d767d3817e89F111d320de151";
+const PutFactoryAddress = "0x2C231969fd81f9AF0Dfda4fd4E5088948438e230";
+const fDAI = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
+const fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
 const LINK = "0x326C977E6efc84E512bB9C30f76E30c160eD06FB";
 
 const goerliTokenName = {
     "0x326C977E6efc84E512bB9C30f76E30c160eD06FB": "LINK",
-    "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00": "fDAIx",
-    "0x88271d333C72e51516B67f5567c728E702b3eeE8": "fDAI",
+    "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f": "fDAIx",
+    "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7": "fDAI",
 };
 
 const goerliTokenDecimal = {
     "0x326C977E6efc84E512bB9C30f76E30c160eD06FB": 1e18,
-    "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00": 1e18,
-    "0x88271d333C72e51516B67f5567c728E702b3eeE8": 1e18,
+    "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f": 1e18,
+    "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7": 1e18,
 };
 
 const OptionFactory = require("../contracts/artifacts/contracts/OptionFactory.sol/OptionFactory.json");
@@ -38,7 +38,7 @@ async function callNotify(optionAddress) {
     try {
         const provider = ethers.getDefaultProvider("goerli");
         const sf = await sfsdk.Framework.create({
-            chainId: Number(5),
+            chainId: Number(80001),
             provider: provider,
         });
         const contract = new ethers.Contract(
