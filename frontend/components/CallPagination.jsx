@@ -42,11 +42,11 @@ export default function PaginatedCallItems({ itemsPerPage }) {
     setItemOffset(newOffset);
   };
 
-  const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
+  const CallFactoryAddress = "0xb5fd8b23C8085d3d767d3817e89F111d320de151";
 
   async function getAllCallOption() {
     if (typeof window.ethereum !== "undefined") {
-      const provider = ethers.getDefaultProvider("goerli");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(
         CallFactoryAddress,
         OptionFactory.abi,

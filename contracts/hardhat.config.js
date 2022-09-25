@@ -15,7 +15,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-const defaultNetwork = "goerli";
+const defaultNetwork = "mumbai";
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -40,9 +40,9 @@ module.exports = {
     //     network_id: "*",
     //     port: 8545,
     // },
-    goerli: {
-      url: `${process.env.GOERLI_ALCHEMY_URL}`,
-      accounts: [`0x${process.env.GOERLI_DEPLOYER_PRIVATE_KEY}`],
+    mumbai: {
+      url: `${process.env.MUMBAI_ALCHEMY_URL}`,
+      accounts: [`0x${process.env.MUMBAI_DEPLOYER_PRIVATE_KEY}`],
       allowUnlimitedContractSize: true,
     },
     hardhat: {

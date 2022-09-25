@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import Card from "./Card";
 
 export default function MyPut() {
-  const PutFactoryAddress = "0x264569c1325C26e41832dE6C8D978d59fCb05D60";
+  const PutFactoryAddress = "0x2C231969fd81f9AF0Dfda4fd4E5088948438e230";
   const [putOptions, setPutOptions] = useState([]);
 
   useEffect(() => {
