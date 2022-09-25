@@ -2027,7 +2027,6 @@
   "version" "1.2.8"
 
 "@superfluid-finance/metadata@git+https://github.com/superfluid-finance/metadata.git":
-  "integrity" "sha512-kTaCRoz2ZqfDBXrS64AsvkajYX9FXreFEJ2rQEJNXlCmswEktDc75+hfiVfNqNBxNut8SW3P8lAw3FCghxYbpA=="
   "resolved" "git+ssh://git@github.com/superfluid-finance/metadata.git#edd18b65e170417d2abff336fc14b6683fcf5e94"
   "version" "1.1.0"
 
@@ -5201,7 +5200,6 @@
     "ethereumjs-util" "^6.0.0"
 
 "ethereumjs-abi@git+https://github.com/ethereumjs/ethereumjs-abi.git":
-  "integrity" "sha512-qs8G5KwnIO/thOQjv1RvR/4oiTsy6IaCsN+ory5dbiqFXz8sd239aWJH0wmsVNPimL5X1KzQheUpi6xAo6FU4w=="
   "resolved" "git+ssh://git@github.com/ethereumjs/ethereumjs-abi.git#ee3994657fa7a427238e6ba92a84d0b529bbcde0"
   "version" "0.6.8"
   dependencies:
