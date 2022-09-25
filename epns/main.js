@@ -399,9 +399,13 @@ async function getSubscriber() {
 }
 
 async function dailyNotify() {
+    console.log("Start Checking...");
     await getSubscriber();
-    checkCallOption();
-    checkPutOption();
+    console.log("Start Call Check");
+    await checkCallOption();
+    console.log("Start Put Check");
+    await checkPutOption();
+    console.log("Done");
 }
 
 dailyNotify();
