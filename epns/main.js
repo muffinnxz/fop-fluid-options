@@ -122,7 +122,9 @@ async function callNotify(optionAddress) {
                                 values.forEach((v) => {
                                     if (
                                         v.flow.deposit >=
-                                            optionData.requiredFlowRate &&
+                                            parseFloat(
+                                                optionData.requiredFlowRate
+                                            ) &&
                                         currentPrice[1] /
                                             10 **
                                                 optionData.priceFeedDecimals >=
@@ -304,7 +306,9 @@ async function putNotify(optionAddress) {
                             values.forEach((v) => {
                                 if (
                                     v.flow.deposit >=
-                                        optionData.requiredFlowRate &&
+                                        parseFloat(
+                                            optionData.requiredFlowRate
+                                        ) &&
                                     currentPrice[1] /
                                         10 ** optionData.priceFeedDecimals <=
                                         optionData.underlyingAmount /
