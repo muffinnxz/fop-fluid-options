@@ -653,7 +653,17 @@ export default function User() {
                                                 </div> */}
                                             </div>
                                         )}
-
+                                    {ethers.BigNumber.from(
+                                        flowRateInfo.flowRate
+                                    ) > 0 && (
+                                        <div style={{ color: "red", marginBottom: "20px" }}>
+                                            Delete flow means you permanently
+                                            close the contract. You will not be
+                                            able to exercise and the contract
+                                            will not return the streamed
+                                            premium.
+                                        </div>
+                                    )}
                                     <div
                                         style={{
                                             display: "flex",
