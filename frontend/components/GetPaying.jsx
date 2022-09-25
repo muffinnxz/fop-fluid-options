@@ -7,15 +7,15 @@ import Card from "./Card";
 import { paperClasses } from "@mui/material";
 
 const config = {
-  hostAddress: "0x22ff293e14F1EC3A09B137e9e06084AFd63adDF9",
-  cfaV1Address: "0xEd6BcbF6907D4feEEe8a8875543249bEa9D308E8",
+  hostAddress: "0xEB796bdb90fFA0f28255275e16936D25d3418603",
+  cfaV1Address: "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873",
   // idaV1Address: "0xB0aABBA4B2783A72C52956CDEF62d438ecA2d7a1",
 };
 
-const fDAIx = "0xF2d68898557cCb2Cf4C10c3Ef2B034b2a69DAD00";
+const fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
 // const cfaV1 = new ConstantFlowAgreementV1({ options: config });
 
-const CallFactoryAddress = "0xca0BF23f1Ea4E08ea053691C0Dd0C066b0c31665";
+const CallFactoryAddress = "0xb5fd8b23C8085d3d767d3817e89F111d320de151";
 export default function GetPaying() {
   const [items, setItems] = useState([]);
   const [paying, setPaying] = useState([]);
@@ -30,7 +30,7 @@ export default function GetPaying() {
 
   async function getAllCallOption() {
     if (typeof window.ethereum !== "undefined") {
-      const provider = ethers.getDefaultProvider("goerli");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(
         CallFactoryAddress,
         OptionFactory.abi,

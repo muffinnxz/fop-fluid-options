@@ -41,11 +41,11 @@ export default function PaginatedPutItems({ itemsPerPage }) {
     setItemOffset(newOffset);
   };
 
-  const PutFactoryAddress = "0x264569c1325C26e41832dE6C8D978d59fCb05D60";
+  const PutFactoryAddress = "0x2C231969fd81f9AF0Dfda4fd4E5088948438e230";
 
   async function getAllPutOption() {
     if (typeof window.ethereum !== "undefined") {
-      const provider = ethers.getDefaultProvider("goerli");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(
         PutFactoryAddress,
         OptionPutFactory.abi,

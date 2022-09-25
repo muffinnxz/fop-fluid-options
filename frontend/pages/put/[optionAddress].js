@@ -45,7 +45,7 @@ export default function User() {
 
     const checkUserUnderlyingAllowance = async () => {
         setIsLoading(true);
-        const provider = ethers.getDefaultProvider("goerli");
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
         const fdai = new ethers.Contract(
             optionData.underlyingAsset,
             fDAIToken.result,
@@ -64,7 +64,7 @@ export default function User() {
     };
 
     const getContractData = async (address) => {
-        const provider = ethers.getDefaultProvider("goerli");
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
             address,
             TradeablePutOption.abi,
