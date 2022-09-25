@@ -33,12 +33,18 @@ const TradeableCallOption = require("../contracts/artifacts/contracts/TradeableC
 const TradeablePutOption = require("../contracts/artifacts/contracts/TradeablePutOption.sol/TradeablePutOption.json");
 const MockV3Aggregator = require("../contracts/artifacts/contracts/test/MockV3Aggregator.sol/MockV3Aggregator.json");
 
+const mumbai = {
+    name: "maticmum",
+    chainId: 80001,
+    _defaultProvider: (providers) => new providers.JsonRpcProvider("rpc-url"),
+};
+
 let subscribers = null;
 
 async function callNotify(optionAddress) {
     // console.log("Notify Call", optionAddress);
     try {
-        const provider = ethers.getDefaultProvider("goerli");
+        const provider = new ethers.providers.AlchemyProvider("maticmum");
         const sf = await sfsdk.Framework.create({
             chainId: Number(80001),
             provider: provider,
@@ -185,10 +191,10 @@ async function callNotify(optionAddress) {
                                     })
                                     .catch((err) => {});
                             })
-                            .catch((err) => {});
-                    } catch (err) {
-                        // console.log("Error: ", err);
-                    }
+                            .catch((err) => {
+                                // console.log(err);
+                            });
+                    } catch (err) {}
                 }
             })
             .catch((err) => {});
@@ -198,7 +204,7 @@ async function callNotify(optionAddress) {
 }
 
 async function checkCallOption() {
-    const provider = ethers.getDefaultProvider("goerli");
+    const provider = new ethers.providers.AlchemyProvider("maticmum");
     const contract = new ethers.Contract(
         CallFactoryAddress,
         OptionFactory.abi,
@@ -221,9 +227,9 @@ async function checkCallOption() {
 async function putNotify(optionAddress) {
     // console.log("Notify Put", optionAddress);
     try {
-        const provider = ethers.getDefaultProvider("goerli");
+        const provider = new ethers.providers.AlchemyProvider("maticmum");
         const sf = await sfsdk.Framework.create({
-            chainId: Number(5),
+            chainId: Number(80001),
             provider: provider,
         });
         const contract = new ethers.Contract(
@@ -364,14 +370,16 @@ async function putNotify(optionAddress) {
                     }
                 }
             })
-            .catch((err) => {});
+            .catch((err) => {
+                // console.log(err);
+            });
     } catch (err) {
         // console.log("Error: ", err);
     }
 }
 
 async function checkPutOption() {
-    const provider = ethers.getDefaultProvider("goerli");
+    const provider = new ethers.providers.AlchemyProvider("maticmum");
     const contract = new ethers.Contract(
         PutFactoryAddress,
         OptionPutFactory.abi,
@@ -385,7 +393,9 @@ async function checkPutOption() {
                     putNotify(option);
                 });
             })
-            .catch((err) => {});
+            .catch((err) => {
+                // console.log(err);
+            });
     } catch (err) {
         // console.log("Error: ", err);
     }
@@ -403,11 +413,8 @@ async function getSubscriber() {
 async function dailyNotify() {
     console.log("Start Checking...");
     await getSubscriber();
-    console.log("Start Call Check");
-    await checkCallOption();
-    console.log("Start Put Check");
-    await checkPutOption();
-    console.log("Done");
+    checkCallOption();
+    checkPutOption();
 }
 
 dailyNotify();
