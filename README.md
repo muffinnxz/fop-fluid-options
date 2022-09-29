@@ -1,5 +1,6 @@
 # FOP - Fluid Options
  Streaming Options Marketplace submitted for ETHOnline2022
+ https://ethglobal.com/showcase/fop-fluid-options-jjg01
 
 ## Project Description
 In a regular option marketplace, the option buyer needs to pay the premium at a fixed cost and at the beginning of the contract. This creates inefficiency for the buyers because they need to pay in advance for the right to exercise their options.
