@@ -40,7 +40,9 @@ export default function Navbar() {
           Notifications
         </button>
         <ConnectWallet className="order-last " />
-        <UDlogin/>
+        <div>
+          <UDlogin/>
+        </div>
       </div>
     </nav>
   );

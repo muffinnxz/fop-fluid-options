@@ -1,2 +1,2 @@
-import UDlogin from "../../hooks/UDlogin";
+import UDlogin from "./UDlogin";
 export default UDlogin
