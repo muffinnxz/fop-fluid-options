@@ -1,5 +1,6 @@
 import ConnectWallet from "./ConnectButton";
 import { useRouter } from "next/router";
+import UDlogin from "./UDlogin";
 
 export default function Navbar() {
   const router = useRouter();
@@ -39,6 +40,7 @@ export default function Navbar() {
           Notifications
         </button>
         <ConnectWallet className="order-last " />
+        <UDlogin/>
       </div>
     </nav>
   );
