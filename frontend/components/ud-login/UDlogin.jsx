@@ -8,8 +8,8 @@ import { Text } from "@nextui-org/react";
 
 // this config has to be completely match when congig a provider
 const uauth = new UAuth({
-  clientID: "3e3d3559-8e71-41af-b9b6-466d136163b5",
-  redirectUri: "http://localhost:3000",
+  clientID: "1cf2e143-b474-43df-a001-1a68d77b8a57",
+  redirectUri: "https://fop-fluid-options.herokuapp.com/",
   scope: "openid wallet"
 })
 
