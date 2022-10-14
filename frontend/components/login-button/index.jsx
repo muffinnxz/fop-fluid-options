@@ -20,6 +20,8 @@ const LoginButton = () => {
   const handleWalletSelection = (e) => {
     if (e.target.name === 'rainbow') {
       setIsUDwalletSelected(false)
+    } else if (e.target.name === 'ud') {
+      setIsUDwalletSelected(true)
     }
     setIsWalletSelected(true)
   }  
