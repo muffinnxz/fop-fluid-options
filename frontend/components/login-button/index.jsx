@@ -1,7 +1,9 @@
-import { Modal, Popover, Button, Text } from "@nextui-org/react";
+import { Modal, Tooltip, Button, Text } from "@nextui-org/react";
 import { useState } from "react";
 import UDLogin from '../ud-login'
-import ConnectWallet from "../ConnectButton";
+import RainbowWallet from "../ConnectButton";
+import { BiPowerOff } from 'react-icons/bi'
+
 
 const LoginButton = () => {
   const [isWalletSelected, setIsWalletSelected] = useState(false)
@@ -59,11 +61,32 @@ const LoginButton = () => {
 
   if(isWalletSelected) {
     if(isUDwalletSelected) {
-      return <UDLogin/>
+      return (
+        <PopoverSwitchWallet setIsWalletSelected={setIsWalletSelected}>
+          <UDLogin/>
+        </PopoverSwitchWallet>
+      )
     }
-    return <ConnectWallet/>
+    return (
+      <PopoverSwitchWallet setIsWalletSelected={setIsWalletSelected}>
+        <RainbowWallet/>
+      </PopoverSwitchWallet>
+    )
   }
   
 }
 
 export default LoginButton
+
+const PopoverSwitchWallet = ({children, setIsWalletSelected}) => {
+  return (
+  <div className="flex justify-center items-center space-x-1">
+    {children}
+    <Tooltip content={"switch wallet ?"} rounded color='invert' placement="bottom">
+      <button className='bg-slate-100 p-2 rounded-xl hover:bg-red-300' onClick={() => setIsWalletSelected(false)}>
+        <BiPowerOff/>
+      </button>
+    </Tooltip>
+  </div>
+  )
+}
